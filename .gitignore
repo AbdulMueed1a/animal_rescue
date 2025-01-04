@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environment directories
+env/
+venv/
+ENV/
+ENV.bak/
+venv.bak/
+
+# Django specific
+*.log
+*.pot
+db.sqlite3
+media/
+staticfiles/
+credentials/
+static/
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# PyCharm project files
+.idea/
+*.iml
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.*
+
+# Test coverage files
+coverage.xml
+*.cover
+.hypothesis/
+
+# Profiling data
+*.prof
+
+# Cache files
+*.cache
