@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Rescue Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 400px;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background: #0056b3;
+        }
+    </style>
+    <script>
+        const citiesByDistrict = {
+            Sindh: ["Karachi", "Hyderabad", "Sukkur"],
+            Punjab: ["Lahore", "Faisalabad", "Rawalpindi"],
+            Balochistan: ["Quetta", "Gwadar", "Turbat"],
+            KPK: ["Peshawar", "Mardan", "Abbottabad"]
+        };
+
+        function updateCities() {
+            const districtSelect = document.getElementById('district');
+            const citySelect = document.getElementById('city');
+            const selectedDistrict = districtSelect.value;
+
+            // Clear current city options
+            citySelect.innerHTML = '<option value="">Select City</option>';
+
+            if (selectedDistrict && citiesByDistrict[selectedDistrict]) {
+                citiesByDistrict[selectedDistrict].forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2>Report Animal Condition</h2>
+        <form action="rescue_submit" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Your Email" required>
+            </div>
+            <div class="form-group">
+                <label for="contact">Contact Number</label>
+                <input type="tel" id="contact" name="contact" placeholder="Your Contact Number" required>
+            </div>
+            <div class="form-group">
+                <label for="district">Provinces</label>
+                <select id="province" name="province" onchange="updateCities()" required>
+                    <option value="">Select Province</option>
+                    <option value="Sindh">Sindh</option>
+                    <option value="Punjab">Punjab</option>
+                    <option value="Balochistan">Balochistan</option>
+                    <option value="KPK">KPK</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="city">City</label>
+                <select id="city" name="city" required>
+                    <option value="">Select City</option>
+                    <option value="">hydrabad</option>
+                    <option value="">karachi</option>
+                    <option value="">sukkur</option>
+                    
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" placeholder="location of the incident" required>
+            </div>
+            <div class="form-group">
+                <label for="condition">Condition of the Animal</label>
+                <select id="condition" name="condition" required>
+                    <option value="critical">Critical</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="Bleeding">Bleeding</option>
+                    <option value="Fractures or Broken Bones">Fractures or Broken Bones</option>
+                    <option value="Poisoned">Poisoned</option>
+                    <option value="not-sure">Not Sure</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="image">Image</label>
+                <input type="file" id="image" name="image" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" placeholder="Provide a brief description"
+                    required></textarea>
+            </div>
+            <div class="form-group">
+                <button type="submit" >Submit Report</button>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

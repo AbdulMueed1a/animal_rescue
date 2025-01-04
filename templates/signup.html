@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>signup</title>
+    <link rel="stylesheet" href="{% static 'style/signup.css'%}">
+</head>
+
+<body>
+    <div class="box">
+        <div class="form">
+            <h1>SignUp</h1>
+            <form method="post" action="signup">
+
+            {% csrf_token %}
+                 <div>
+                    {% for message in messages %}
+                    <p>{{message}}</p>
+                    {% endfor %}
+                </div>
+                <div class="inputbox">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
+                <div class="inputbox">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
+                <div class="inputbox">
+                    <label for="username">UserName</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+
+                <div class="inputbox">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="inputbox">
+                    <label for="password1">Password</label>
+                    <input type="password" id="password1" name="password1" required>
+                </div>
+                <div class="inputbox">
+                    <label for="password2">Confrim Password</label>
+                    <input type="password" id="password2" name="password2" required>
+                </div>
+
+                <h6>already  have a Accout?
+                    <a href="login.html">Login</a>
+                </h6>
+                <input type="submit" value="submit" class="sub" id="submit">    
+            </form>
+        </div>
+    </div>
+    <div class="box2">
+        <img src="images/character.png" alt="" class="image1">
+    </div>
+</body>
+
+</html>

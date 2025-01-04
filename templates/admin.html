@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Animal Injury Reporting System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .sub-header {
+            background-color: #f8f8f8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        .logout {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .logout:hover {
+            background-color: #45a049;
+        }
+        .container {
+            display: grid;
+            grid-template-areas:
+                "stats stats"
+                "users reports"
+                "controls controls";
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 15px;
+        }
+        .stats {
+            grid-area: stats;
+            display: flex;
+            justify-content: space-around;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .stats div {
+            text-align: center;
+        }
+        .users {
+            grid-area: users;
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .reports {
+            grid-area: reports;
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .controls {
+            grid-area: controls;
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f9;
+        }
+    </style>
+    <script>
+        function openLocation(caseId) {
+            alert(`Opening location for case ID: ${caseId}`);
+            // Simulating map opening
+            window.open(`https://www.google.com/maps/search/?api=1&query=location+of+case+${caseId}`, '_blank');
+        }
+
+        function updateStatus(caseId) {
+            const newStatus = prompt(`Update status for case ID ${caseId} (e.g., Ongoing, Completed):`);
+            if (newStatus) {
+                alert(`Case ID ${caseId} status updated to: ${newStatus}`);
+                // Here, send the new status to the server via an API call.
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        Admin Dashboard - Animal Injury Reporting System
+    </div>
+    <div class="sub-header">
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="my_reports.html">My Reports</a>
+            <a href="faqs.html">FAQs</a>
+            <a href="profile.html">Profile</a>
+        </div>
+        <a href="logout.html" class="logout">Logout</a>
+    </div>
+    <div class="container">
+        <div class="stats">
+            <div>
+                <h3>200</h3>
+                <p>Total Reports</p>
+            </div>
+            <div>
+                <h3>150</h3>
+                <p>Active Users</p>
+            </div>
+            <div>
+                <h3>75</h3>
+                <p>Resolved Cases</p>
+            </div>
+        </div>
+        <div class="users">
+            <h3>User Management</h3>
+            <table>
+                <tr>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+                <tr>
+                    <td>001</td>
+                    <td>Amjad</td>
+                    <td>amjad001.com</td>
+                    <td>User</td>
+                    <td><button>Edit</button><button>Delete</button></td>
+                </tr>
+                <tr>
+                    <td>002</td>
+                    <td>kamran</td>
+                    <td>kamran002.com</td>
+                    <td>Admin</td>
+                    <td><button>Edit</button><button>Delete</button></td>
+                </tr>
+                <tr>
+                    <td>003</td>
+                    <td>Naveen</td>
+                    <td>naveen003.com</td>
+                    <td>User</td>
+                    <td><button>Edit</button><button>Delete</button></td>
+                </tr>
+            </table>
+        </div>
+        <div class="reports">
+            <h3>Recent Reports</h3>
+            <table>
+                <tr>
+                    <th>Report ID</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Assigned Team</th>
+                    <th>Actions</th>
+                    <th>Reported By</th>
+                </tr>
+                <tr>
+                    <td>101</td>
+                    <td>27-12-2024</td>
+                    <td>Ongoing</td>
+                    <td>Team A</td>
+                    <td>
+                        <button onclick="openLocation(101)">View Location</button>
+                        <button onclick="updateStatus(101)">Update Status</button>
+                    </td>
+                    <td>Kamran</td>
+                </tr>
+                <tr>
+                    <td>102</td>
+                    <td>26-12-2024</td>
+                    <td>Resolved</td>
+                    <td>Team B</td>
+                    <td>
+                        <button onclick="openLocation(102)">View Location</button>
+                        <button onclick="updateStatus(102)">Update Status</button>
+                    </td>
+                    <td>Naveen</td>
+                </tr>
+            </table>
+        </div>
+        <div class="controls">
+            <button>Generate all Report</button>
+        </div>
+    </div>
+    <div class="footer">
+        &copy; 2024 Animal Injury Reporting System. All rights reserved.
+    </div>
+</body>
+</html>

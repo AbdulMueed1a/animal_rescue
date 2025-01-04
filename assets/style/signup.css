@@ -1,0 +1,84 @@
+* {
+    padding: 0;
+    font-family: sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    padding-bottom: 150px;
+    background: url('images/bg2.jpg');
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-size: cover;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+.box .form h1{
+    text-align: center;
+}
+
+.box {
+    padding: 20px 30px;
+    width: 300px;
+    height: 480px;
+    backdrop-filter: blur(50px);
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    background: rgb(255, 255, 255);
+    box-shadow: -10px 8px 15px rgba(0, 0, 0, 0.1); /*Add shadow here*/
+    color: #000000;
+}
+
+
+.box2 {
+    padding: 20px 30px;
+    width: 300px;
+    height: 480px;
+    backdrop-filter: blur(50px);
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    background: rgb(255, 255, 255);
+    box-shadow: 10px 8px 15px rgba(0, 0, 0, 0.1 ); /* Shift shadow to the right */
+    display: flex;
+    justify-content: center;
+    position: relative; /* Required for the pseudo-element*/
+}
+.image1{
+    transform: scaleX(-1);    
+    
+}
+
+.inputbox {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.inputbox label {
+    color: #000000;
+    margin-bottom: 5px;
+}
+
+.inputbox input {
+    padding: 5px 20px;
+    border: none;
+    outline: none;
+    background: none;
+    border-bottom: 1px solid #12151e;
+    color: #000000;
+}
+
+.sub {
+    margin-left: 15px;
+    padding: 10px 80px;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    background: #ffb727;
+    cursor: pointer;
+    font-size: 16px;
+}

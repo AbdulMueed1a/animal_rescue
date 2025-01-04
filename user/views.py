@@ -3,11 +3,10 @@ import smtplib
 import string
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
+from credentials import logindetails
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User,auth
 from django.contrib import messages
-from credentials import logindetails
 
 # Create your views here.
 def index(request):
