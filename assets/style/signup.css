@@ -6,7 +6,7 @@
 
 body {
     padding-bottom: 150px;
-    background: url('images/bg2.jpg');
+    background: url("{% static 'images/bg2.jpg'%}");
     display: flex;
     justify-content: center;
     align-items: center;

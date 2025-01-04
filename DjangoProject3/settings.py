@@ -85,10 +85,10 @@ DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.mysql',
 		'NAME': 'animalform',
-		'USER': logindetails.sql_user,
-		'PASSWORD': logindetails.sql_password,
-		'HOST':logindetails.sql_host,
-		'PORT':logindetails.sql_port,
+		'USER': f'{logindetails.sql_user}',
+		'PASSWORD': f'{logindetails.sql_password}',
+		'HOST': f'{logindetails.sql_host}',
+		'PORT': f'{logindetails.sql_port}',
 	}
 }
 

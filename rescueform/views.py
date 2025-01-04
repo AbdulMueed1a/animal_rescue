@@ -6,6 +6,9 @@ from .models import submission
 # Create your views here.
 def form(request):
     return render(request,'form.html')
+def index(request):
+    return render(request, 'index.html')
+
 
 def rescue_submit(request):
     subm = submission()
