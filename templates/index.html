@@ -302,7 +302,7 @@
 
             .donateB {
                 margin-left: 15px;
-                padding: 10px 4 0px;
+                padding: 10px;
                 color: #fff;
                 border: none;
                 border-radius: 20px;
@@ -791,11 +791,13 @@
     <section class="hero">
         <img src="{% static 'images/voice.png'%}" alt="Centered Image">
         {% if user.is_authenticated %}
-        <h1>Welcome! {{ user.first_name }}</h1>
-        {% else %}
-        <a type="button" href="user/signup" class="sub" id="signup">SignUp</a>
-        <a type="button" href="user/login" class="sub" id="signup">login</a>
+        <h1>Welcome! {{ user.first_name }} {{ user.last_name }}</h1>
+{#        {% else %}#}
+{#        <a type="button" href="user/signup" class="sub" id="signup">SignUp</a>#}
+{#        <a type="button" href="user/login" class="sub" id="signup">login</a>#}
         {% endif %}
+        <a type="button" href="form" class="sub" id="signup">Submit a report</a>
+
     </section>
 
     <div class="quote">

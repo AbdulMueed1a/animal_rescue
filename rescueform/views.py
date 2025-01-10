@@ -1,11 +1,16 @@
 import os
 import time
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+
+import user
 from .models import submission
 # Create your views here.
 def form(request):
-    return render(request,'form.html')
+    if request.user.is_authenticated:
+        return render(request,'form.html')
+    else:
+        return redirect('../user/login')
 def index(request):
     return render(request, 'index.html')
 
@@ -24,7 +29,14 @@ def rescue_submit(request):
         subm.description = request.POST['description']
         subm.save()
         image_path = subm.image.path
-
         # time.sleep(5)
-        return render(request,'submitted.html',{'subm':subm})
+        return redirect('dasboard/')
 
+def my_reports(request):
+    # return render(request, "reportDashboard.html", {})
+
+    if request.user.is_authenticated:
+        submissions = submission.objects.filter(email=request.user.email)
+        return render(request, 'reportDashboard.html', {'usersubm': submissions,'storedReports': submission.objects.all()})
+    else:
+        return redirect('../user/login')
