@@ -126,11 +126,15 @@ def login(request):
             user = auth.authenticate(username=username, password=password)
         if user is not None:
             auth.login(request, user)
-            return redirect('/user')
+            next_url = request.GET.get("next", "/")  # Default to `/` if `next` is not provided
+            return redirect(next_url)
 
     else:
         return render(request,"login.html")
 
 def logout(request):
-    auth.logout(request)
-    return redirect('/user')
+    if request.user.is_authenticated:
+        auth.logout(request)
+        return redirect('/..')
+    else:
+        return redirect('/user/login')

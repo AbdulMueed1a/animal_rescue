@@ -108,6 +108,7 @@ body {
             <h1>Login</h1>
             <form method="post" action="login">
                 {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
                 <div class="inputbox">
                     <label for="email">Email/Username</label>
                     <input type="text" id="email" name="Email_username" required>

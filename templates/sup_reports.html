@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Reports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card .info {
+            flex: 1;
+        }
+        .card h3 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+        .card p {
+            margin: 0;
+            color: #666;
+        }
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dropdown {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .delete-btn {
+            background: none;
+            border: none;
+            color: red;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Emergency Reports</h1>
+        {% for report in reports %}
+        <div class="card">
+            <div class="info">
+                <img src="{{ report.image.url }}" alt="{{ report.title }}" style = " width:25%; height:25%; margin-bottom: 10px; ">
+                <h3>{{ report.title }}</h3>
+                <p>{{ report.date }}</p>
+                <p>{{ report.description }}</p>
+                <small>Status: <strong>{{ report.get_status_display }}</strong></small>
+            </div>
+            <div class="actions">
+                <form action="{% url 'update_status' report.id %}" method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <select name="status" class="dropdown" onchange="this.form.submit()">
+                        <option value="received" {% if report.status == "submitted" %}selected{% endif %}>Report Receive</option>
+                        <option value="pending_verification" {% if report.status == "ongoing" %}selected{% endif %}>Pending Verification</option>
+                        <option value="verified" {% if report.status == "resolved" %}selected{% endif %}>Verified</option>
+                        <option value="assigned" {% if report.status == "resolved" %}selected{% endif %}>Assigned to NGO/Hospital</option>
+                        <option value="in_progress" {% if report.status == "resolved" %}selected{% endif %}>In Progress</option>
+                        <option value="resolved" {% if report.status == "resolved" %}selected{% endif %}>Resolved</option>
+                        <option value="closed" {% if report.status == "resolved" %}selected{% endif %}>Closed</option>
+                    </select>
+                </form>
+                <form action="{% url 'delete_report' report.id %}" method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-btn"><i class="fas fa-trash"></i></button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
