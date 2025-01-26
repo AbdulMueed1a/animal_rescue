@@ -5,33 +5,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report Page</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         body {
+            justify-content: left;
             display: flex;
             flex-direction: row-reverse;
             font-family: Arial, sans-serif;
+            overflow: auto;
             margin: 0;
             padding: 0;
             height: 100vh;
         }
 
+        .useless-card{
+            display: flex;
+            padding: 15px 25px;
+            flex-direction: column;
+        }
+
         .vertical-card {
-            width: 50%;
+            width: 25%;
             border-right: 2px solid #ccc;
-            {#overflow-y: auto;#}
+            overflow-y: auto;
             padding: 10px;
             box-shadow: -3px 0px 5px rgba(0, 0, 0, 0.1);
         }
 
         .horizontal-card-container {
+            border: 5px solid #ccc;
+            border-radius: 5px;
             flex-grow: 1;
             display: flex;
+            overflow: auto;
             flex-direction: column;
             padding: 20px;
             box-sizing: border-box;
         }
 
         .horizontal-card {
+            height: fit-content;
+            width: auto;
             flex-grow: 2;
             border: 2px solid #ccc;
             border-radius: 8px;
@@ -42,11 +57,12 @@
         }
 
         .report-card {
-            border: 1px solid #ddd;
+            height: fit-content;
+            width: fit-content;
             border-radius: 6px;
             padding: 10px;
             margin: 10px 0;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 7px 3px 6px rgba(0, 0, 0, 0.1);
         }
 
         .add-report-button {
@@ -75,111 +91,80 @@
         }
     </style>
 
-<!--    <script>
-        function redirectToForm() {
-            window.location.href = "form.html";
-        }
-
-        function addReportCard(report) {
-            const userReportsContainer = document.querySelector('.horizontal-card');
-            const allUserReportsContainer = document.querySelector('.vertical-card');
-
-            // Create a new card for user reports
-            const userReportCard = document.createElement('div');
-            userReportCard.classList.add('report-card');
-            const date = new Date();
-            userReportCard.innerHTML = `
-                <p><strong>Name:</strong> ${report.name}</p>
-                <p><strong>Contact:</strong> ${report.contact}</p>
-                <p><strong>Animal:</strong> ${report.animal}</p>
-                <p><strong>District:</strong> ${report.district}</p>
-                <p><strong>City:</strong> ${report.city}</p>
-                <p><strong>Location:</strong> ${report.location}</p>
-                <p><strong>Date:</strong> ${report.date}</p>
-                <p><strong>Image:</strong> ${report.Image}</p>
-
-            `;
-
-            // name
-            // contact
-            // animal
-            // district
-            // city
-            // location
-            // description
-            // image
-
-
-            // Create a separate card for all user reports
-            const allUserReportCard = userReportCard.cloneNode(true);
-
-            // Append the cards to respective containers
-            userReportsContainer.appendChild(userReportCard);
-            allUserReportsContainer.appendChild(allUserReportCard);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const storedReports = JSON.parse(localStorage.getItem('allReports')) || [];
-
-            // Load and display all stored reports
-            storedReports.forEach(report => {
-                addReportCard(report);
-            });
-
-            // Listen for new report addition (Example: You can modify this to add reports dynamically)
-            const newReport = JSON.parse(localStorage.getItem('newReport'));
-            if (newReport) {
-                storedReports.push(newReport); // Add the new report to the stored list
-                addReportCard(newReport); // Display the new report
-                localStorage.setItem('allReports', JSON.stringify(storedReports)); // Save updated reports
-                localStorage.removeItem('newReport'); // Clear temporary storage for new report
-            }
-        });
-    </script>-->
 
 </head>
 
 <body>
-    <div class="horizontal-card-container">
-        {%  for subm in usersubm %}
-        <div class="horizontal-card">
-            <h2>Your Submitted Reports</h2>
-            <div class="report-card">
-                <img src="{{ subm.image.url }}" alt="{{ subm.title }}" style = " width:50%; height:50%; margin-bottom: 10px; ">
-                <p><strong>Date:</strong> {{ subm.date }}</p>
-                {% if not user.username ==  subm.username  %}
-                <p>this was submitted using a different user account</p>
-                {% endif %}
-                <p><strong>City:</strong>{{ subm.city }}</p>
-                <p><strong>Email:</strong>{{ subm.email }}</p>
-                <p><strong>Address:</strong> {{ subm.location }}</p>
-                <p><strong>Status:</strong> {{ subm.condition }}</p>
+    <div class = "useless-card">
+        <div class="horizontal-card-container">
+        <h2>Your Submitted Reports</h2>
+            {%  for subm in usersubm %}
+            <div class="horizontal-card">
+                <div class="report-card">
+                    <img src="{{ subm.image.url }}" alt="{{ subm.title }}" style = " width:auto; height: 1in; margin-bottom: 10px; ">
+                    <p><strong>Date:</strong> {{ subm.date }}</p>
+                    {% if not user.username ==  subm.username  %}
+                    <p>this was submitted using a different user account</p>
+                    {% endif %}
+                    <p><strong>City:</strong>{{ subm.city }}</p>
+                    <p><strong>Email:</strong>{{ subm.email }}</p>
+                    <p><strong>Address:</strong> {{ subm.address }}</p>
+                    <p><strong>Status:</strong> {{ subm.condition }}</p>
+                </div>
+
             </div>
+            {% endfor %}
 
         </div>
-        {% endfor %}
-        <button class="add-report-button" onclick="redirectToForm()">Add a Report</button>
-
-        <div>
-            <a href="reportDashboard.html">
-                <button class="add-report-button" onclick="localStorage.clear()">Clear Storage</button>
-            </a>
-            The Button is just for Dev
+        <div class="button">
+            <button class="add-report-button" type="submit" href="../form/">Add a Report</button>
         </div>
     </div>
-
     <div class="vertical-card">
-        <h2>All User Reports</h2>
+        <h2>Global Reports</h2>
+        <div id="map" style="height: 500px; width: auto;"></div>
         {%  for report in storedReports %}
         <div class="report-card">
             <img src="{{ report.image.url }}" alt="{{ report.title }}" style = " width:50%; height:50%; margin-bottom: 10px; ">
 {#            <p><strong>Date:</strong> 2025-01-03</p>#}
             <p><strong>City:</strong> {{ report.city }}</p>
-            <p><strong>Address:</strong> {{ report.location }}</p>
+            <p><strong>Address:</strong> {{ report.address }}</p>
             <p><strong>Status:</strong> {{ report.condition }}</p>
         </div>
         {% endfor %}
 
+
+
+
+    {{ location_data|json_script:"storedReportsData" }}
+
+    <!-- JavaScript for Map -->
+    <script>
+
+        // Initialize the map
+        const map = L.map('map').setView([30.3753, 69.3451], 6); // Default center of Pakistan
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+        }).addTo(map);
+
+        // Fetch storedReportsData from the hidden script
+        const storedReportsElement = document.getElementById('storedReportsData');
+        if (storedReportsElement) {
+            const locations = JSON.parse(storedReportsElement.textContent);
+            console.log(`${locations.length} locations loaded.`);
+
+            // Add markers to the map
+            locations.forEach(function (location) {
+                L.marker([location.latitude, location.longitude])
+                    .addTo(map)
+                    .bindPopup(`<b>Latitude:</b> ${location.latitude}<br><b>Longitude:</b> ${location.longitude}`);
+            });
+        } else {
+            console.error("No location data found.");
+        }
+    </script>
     </div>
 </body>
 

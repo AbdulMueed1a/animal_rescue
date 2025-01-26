@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="{% static  "style/form.css" %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const citiesByDistrict = {
@@ -47,23 +50,23 @@
             {% csrf_token %}
             <h2>Report Animal Condition</h2>
             <div class="form-group">
-                <label for="name">Name</label>
+                <label for="name">Name : </label>
                 <input type="text" id="name" name="name" placeholder="Your Name" required>
             </div>
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="email">Email : </label>
                 <input type="email" id="email" name="email" placeholder="Your Email" required>
             </div>
             <div class="form-group">
-                <label for="animal">What Animal</label>
+                <label for="animal">What Animal : </label>
                 <input type="text" id="animal" name="animal" placeholder="What animal" required>
             </div>
             <div class="form-group">
-                <label for="contact">Contact Number</label>
+                <label for="contact">Contact Number : </label>
                 <input type="tel" id="contact" name="contact" placeholder="Your Contact Number" required>
             </div>
             <div class="form-group">
-                <label for="district">Provinces</label>
+                <label for="district">Provinces : </label>
                 <select id="district" name="district" required>
                     <option value="">Select Provinces</option>
                     <option value="Sindh">Sindh</option>
@@ -73,21 +76,23 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="city">City</label>
+                <label for="city">City : </label>
                 <select id="city" name="city" required>
                     <option value="">Select City</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="date">Date (Optional)</label>
-                <input type="date" id="date" name="date" >
+                <label for="date">Date (Optional) : </label>
+                <input type="date" id="date" name="date" format="YYYY/MM/DD" default="now" >
             </div>
             <div class="form-group">
-                <label for="location">Location</label>
-                <input type="text" id="location" name="location" placeholder="Location of the incident" required>
-            </div>
+                <label for="location">Location : </label>
+                <div id="map" style="height: 200px; width: 25%; border: 10px; border-color: #a41515;"></div>
+
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
             <div class="form-group">
-                <label for="condition">Condition of the Animal</label>
+                <label for="condition">Condition of the Animal : </label>
                 <select id="condition" name="condition" required>
                     <option value="critical">Critical</option>
                     <option value="urgent">Urgent</option>
@@ -98,18 +103,77 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="image">Image</label>
+                <label for="image">Image : </label>
                 <input type="file" id="image" name="image" accept="image/*">
             </div>
             <div class="form-group">
-                <label for="description">Description</label>
+                <label for="description">Description : </label>
                 <textarea id="description" name="description" placeholder="Provide a brief description"
                     required></textarea>
             </div>
             <div class="form-group">
-                <button type="submit">Submit Report</button>
+                <button type="submit">Submit Report : </button>
             </div>
         </form>
+
+        <script>
+            const map = L.map('map').setView([30.3753, 69.3451], 6); // Default location: Pakistan
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+            }).addTo(map);
+
+            let marker;
+
+            // Handle map clicks
+            map.on('click', function (e) {
+                const { lat, lng } = e.latlng;
+
+                // Update the hidden input fields
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lng;
+
+                // Add or update marker
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng).addTo(map);
+                }
+            });
+
+            // Auto-detect location
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+
+                    // Center the map and add a marker
+                    map.setView([latitude, longitude], 13);
+                    marker = L.marker([latitude, longitude]).addTo(map);
+
+                    // Update the hidden input fields
+                    document.getElementById('latitude').value = latitude;
+                    document.getElementById('longitude').value = longitude;
+                },
+                (error) => {
+                    console.error('Error getting location:', error);
+                },
+                { enableHighAccuracy: true }
+            );
+
+            // Prevent form submission if coordinates are empty
+            document.getElementById('reportForm').addEventListener('submit', function (event) {
+                const latitude = document.getElementById('latitude').value;
+                const longitude = document.getElementById('longitude').value;
+
+                if (!latitude || !longitude) {
+                    alert('Please select a location on the map.');
+                    event.preventDefault(); // Stop form submission
+                }
+            });
+
+
+
+    </script>
     </div>
 
 

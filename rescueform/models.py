@@ -1,3 +1,5 @@
+from _datetime import date
+
 from django.db import models
 
 # Create your models here.
@@ -20,9 +22,11 @@ class submission(models.Model):
     contact = models.CharField(max_length=100)
     province = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
-    date = models.DateField()
+    date = models.DateField(default=date.today)
     image = models.ImageField(upload_to='images/')
-    location = models.CharField(max_length=100)
+    latitude = models.FloatField(default=0.0,null=True, blank=True)
+    longitude = models.FloatField(default=0.0,null=True, blank=True)
+    address = models.CharField(max_length=200,null=True, blank=True)
     description = models.TextField()
     condition = models.CharField(max_length=100)
     status = models.CharField(max_length=100,choices=STATUS_CHOICES,default="received")

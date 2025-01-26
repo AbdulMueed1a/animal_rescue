@@ -1,10 +1,13 @@
 import os
 import time
+from contextlib import nullcontext
+
+from django.db.models import Q
 
 from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from itertools import chain
-import user
+import requests
 from .models import submission
 from django.contrib.auth.decorators import login_required
 
@@ -19,6 +22,29 @@ def form(request):
 def index(request):
     return render(request, 'index.html')
 
+
+
+def reverse_geocode(lat, lon):
+
+    url = f"https://nominatim.openstreetmap.org/reverse"
+    params = {
+        "lat": lat,
+        "lon": lon,
+        "format": "json"
+    }
+    headers = {
+        "User-Agent": "YourAppName/1.0"
+    }
+
+    try:
+        response = requests.get(url, params=params, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('display_name', "Address not found")
+    except requests.RequestException as e:
+        return f"Error: {e}"
+
+
 @login_required(login_url='/login/')
 def rescue_submit(request):
     subm = submission()
@@ -31,8 +57,12 @@ def rescue_submit(request):
         subm.province = request.POST['district']
         subm.image = request.FILES['image']
         subm.city = request.POST['city']
-        subm.date = request.POST['date']
-        subm.location = request.POST['location']
+        if request.POST['date']:
+            subm.date = request.POST['date']
+        subm.latitude = request.POST['latitude']
+        subm.longitude = request.POST['longitude']
+        subm.address = reverse_geocode(subm.latitude, subm.longitude)
+        print(subm.address)
         subm.condition = request.POST['condition']
         subm.description = request.POST['description']
         subm.save()
@@ -45,7 +75,10 @@ def rescue_submit(request):
 def my_reports(request):
     # return render(request, "reportDashboard.html", {})
     submissions = list(chain(submission.objects.filter(email=request.user.email) , submission.objects.filter(username=request.user.username)))
-    return render(request, 'reportDashboard.html', {'usersubm': submissions,'storedReports': submission.objects.all()})
+    submissions.sort(key=lambda x: x.id, reverse=True)
+    subs = submission.objects.filter(latitude__isnull=False, longitude__isnull=False)
+    location_data=[{'latitude':sub.latitude,'longitude':sub.longitude} for sub in subs]
+    return render(request, 'reportDashboard.html', {'usersubm': submissions,'storedReports': submission.objects.all().order_by("-id"), 'location_data': location_data})
 
 @login_required(login_url='/login/')
 def emergency_report_list(request):
