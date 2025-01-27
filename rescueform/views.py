@@ -59,9 +59,12 @@ def rescue_submit(request):
         subm.city = request.POST['city']
         if request.POST['date']:
             subm.date = request.POST['date']
-        subm.latitude = request.POST['latitude']
-        subm.longitude = request.POST['longitude']
-        subm.address = reverse_geocode(subm.latitude, subm.longitude)
+        if request.POST['address']:
+            subm.address = request.POST['address']
+        else:
+            subm.latitude = request.POST['latitude']
+            subm.longitude = request.POST['longitude']
+            subm.address = reverse_geocode(subm.latitude, subm.longitude)
         print(subm.address)
         subm.condition = request.POST['condition']
         subm.description = request.POST['description']
@@ -82,9 +85,9 @@ def my_reports(request):
 
 @login_required(login_url='/login/')
 def emergency_report_list(request):
-    if request.user.is_authenticated and request.user.is_superuser:
+    # if request.user.is_authenticated and request.user.is_superuser:
         reports = submission.objects.all()
-        return render(request, 'sup_reports.html', {'reports': reports})
+        return render(request, 'sup_reports.html', {'reports': reports.order_by("-id")})
     # elif request.user.is_authenticated and not request.user.is_superuser:
     #     return HttpResponseForbidden()
 
