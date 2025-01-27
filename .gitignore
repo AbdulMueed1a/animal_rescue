@@ -26,6 +26,7 @@ static/
 .idea/
 *.iml
 secrets.env
+.venv
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
