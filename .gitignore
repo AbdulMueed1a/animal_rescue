@@ -25,7 +25,7 @@ static/
 # PyCharm project files
 .idea/
 *.iml
-
+secrets.env
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 

@@ -9,12 +9,17 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import environ
+import django_heroku
 from pathlib import Path
 from credentials import logindetails
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+env = environ.Env(
+    DEBUG=(bool, False),
+)
 
 
 # Quick-start development settings - unsuitable for production
@@ -24,9 +29,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-s7*uv@a_)ctf#n1w=sz5u59z2v=05vfuc4ko=zqjx7g+u5np0n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 SITE_ID = 1
 
@@ -85,10 +90,10 @@ DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.mysql',
 		'NAME': 'animalform',
-		'USER': f'{logindetails.sql_user}',
-		'PASSWORD': f'{logindetails.sql_password}',
-		'HOST': f'{logindetails.sql_host}',
-		'PORT': f'{logindetails.sql_port}',
+		'USER': env('DB_USER'),
+		'PASSWORD': env('DB_PASSWORD'),
+		'HOST': env('DB_HOST'),
+		'PORT': env('DB_PORT'),
 	}
 }
 
@@ -129,8 +134,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [(BASE_DIR / 'static')]
-STATIC_ROOT = BASE_DIR / 'assets'
+if DEBUG:
+    STATICFILES_DIRS = [(BASE_DIR / 'static')]
+else:
+    STATIC_ROOT = BASE_DIR / 'assets'
 
 
 MEDIA_URL = '/media/'
@@ -140,3 +147,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+django_heroku.settings(locals())
