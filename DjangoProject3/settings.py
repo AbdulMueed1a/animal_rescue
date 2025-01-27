@@ -17,19 +17,19 @@ from credentials import logindetails
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env(
-    DEBUG=(bool, False),
-)
+# env = environ.Env(
+#     DEBUG=(bool, False),
+# )
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-s7*uv@a_)ctf#n1w=sz5u59z2v=05vfuc4ko=zqjx7g+u5np0n'
+SECRET_KEY = logindetails.key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -41,6 +41,7 @@ SITE_ID = 1
 INSTALLED_APPS = [
     'rescueform.apps.RescueformConfig',
     'user.apps.UserConfig',
+    "webpush",
     'Animalrescue_project.apps.AnimalreascueProjectConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites'
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -90,10 +92,10 @@ DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.mysql',
 		'NAME': 'animalform',
-		'USER': env('DB_USER'),
-		'PASSWORD': env('DB_PASSWORD'),
-		'HOST': env('DB_HOST'),
-		'PORT': env('DB_PORT'),
+		'USER': logindetails.sql_user,
+		'PASSWORD': logindetails.sql_password,
+		'HOST': logindetails.sql_host,
+		'PORT': logindetails.sql_port,
 	}
 }
 
@@ -134,10 +136,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-if DEBUG:
-    STATICFILES_DIRS = [(BASE_DIR / 'static')]
-else:
-    STATIC_ROOT = BASE_DIR / 'assets'
+STATICFILES_DIRS = [(BASE_DIR / 'static')]
+STATIC_ROOT = BASE_DIR / 'assets'
+# if DEBUG:
+# else:
 
 
 MEDIA_URL = '/media/'
@@ -148,4 +150,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-django_heroku.settings(locals())
+# django_heroku.settings(locals())
