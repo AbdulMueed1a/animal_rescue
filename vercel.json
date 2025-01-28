@@ -1,17 +1,22 @@
 {
-    "builds": [{
-        "src": "DjangoProject3/wsgi.py",
-        "use": "@vercel/python",
-        "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" },
-        "env": {
-      "MYSQLCLIENT_CFLAGS": "-I/usr/include/mysql",
-      "MYSQLCLIENT_LDFLAGS": "-L/usr/lib/x86_64-linux-gnu -lmysqlclient"
+  "builds": [
+    {
+      "src": "DjangoProject3/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.9"
+      }
     }
-    }],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "DjangoProject3/wsgi.py"
-        }
-    ]
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "DjangoProject3/wsgi.py"
+    }
+  ],
+  "env": {
+    "MYSQLCLIENT_CFLAGS": "-I/usr/include/mysql",
+    "MYSQLCLIENT_LDFLAGS": "-L/usr/lib/x86_64-linux-gnu -lmysqlclient"
+  }
 }
