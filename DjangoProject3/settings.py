@@ -88,20 +88,24 @@ WSGI_APPLICATION = 'DjangoProject3.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.postgresql',
-		'NAME': 'animalform',
-		'USER': logindetails.sql_user,
-		'PASSWORD': logindetails.sql_password,
-		'HOST': logindetails.sql_host,
-		'PORT': logindetails.sql_port,
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
-	}
-}
-database = DATABASES['default']=dj_database_url.parse(f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require")
+# DATABASES = {
+# 	'default': {
+# 		'ENGINE': 'django.db.backends.postgresql',
+# 		'NAME': 'animalform',
+# 		'USER': logindetails.sql_user,
+# 		'PASSWORD': logindetails.sql_password,
+# 		'HOST': logindetails.sql_host,
+# 		'PORT': logindetails.sql_port,
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#         },
+# 	}
+# }
+# database = DATABASES['default']=dj_database_url.parse(f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require")
+POSTGRES_DATABASE = dj_database_url.parse(
+    f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
+)
+DATABASES = {'default': POSTGRES_DATABASE}
 
 
 
