@@ -14,9 +14,5 @@
       "src": "/(.*)",
       "dest": "DjangoProject3/wsgi.py"
     }
-  ],
-  "env": {
-    "MYSQLCLIENT_CFLAGS": "-I/usr/include/mysql",
-    "MYSQLCLIENT_LDFLAGS": "-L/usr/lib/x86_64-linux-gnu -lmysqlclient"
-  }
+  ]
 }
