@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'DjangoProject3.wsgi.application'
 
 DATABASES = {
 	'default': {
-		'ENGINE': 'django.db.backends.mysql',
+		'ENGINE': 'django.db.backends.postgresql',
 		'NAME': 'animalform',
 		'USER': logindetails.sql_user,
 		'PASSWORD': logindetails.sql_password,

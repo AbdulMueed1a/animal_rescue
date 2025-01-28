@@ -2,7 +2,11 @@
     "builds": [{
         "src": "DjangoProject3/wsgi.py",
         "use": "@vercel/python",
-        "config": { "maxLambdaSize": "15mb", "runtime": "python3.9.0" }
+        "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" },
+        "env": {
+      "MYSQLCLIENT_CFLAGS": "-I/usr/include/mysql",
+      "MYSQLCLIENT_LDFLAGS": "-L/usr/lib/x86_64-linux-gnu -lmysqlclient"
+    }
     }],
     "routes": [
         {
