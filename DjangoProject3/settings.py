@@ -12,8 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from credentials import logindetails
-import pymysql
-pymysql.install_as_MySQLdb()
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -91,7 +90,7 @@ WSGI_APPLICATION = 'DjangoProject3.wsgi.application'
 
 DATABASES = {
 	'default': {
-		'ENGINE': 'django.db.backends.mysql',
+		'ENGINE': 'django.db.backends.postgresql',
 		'NAME': 'animalform',
 		'USER': logindetails.sql_user,
 		'PASSWORD': logindetails.sql_password,
@@ -102,6 +101,7 @@ DATABASES = {
         },
 	}
 }
+database = DATABASES['default']=dj_database_url.parse(f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require")
 
 
 

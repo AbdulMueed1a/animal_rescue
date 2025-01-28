@@ -1,3 +1,5 @@
+import os
+
 import environ
 import random
 import smtplib
@@ -22,8 +24,8 @@ def generate_otp(length=6):
 def send_email(note,recipient_email):
     smtp_server = "smtp.gmail.com"  # Example: Gmail SMTP server
     smtp_port = 587  # Port for TLS
-    sender_email = logindetails.sender_email
-    mail_pass = logindetails.sender_password
+    sender_email = os.environ.get("EMAIL_HOST_USER")
+    mail_pass = os.environ.get("EMAIL_HOST_PASSWORD")
     sub = "Your One-Time Password (OTP)"
     body = f"""
                This is your One-Time Password (OTP): {note}. Use it now to proceed with your request.
