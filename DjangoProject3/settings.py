@@ -10,10 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
-import django_heroku
 from pathlib import Path
 from credentials import logindetails
-
+import pymysql
+pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -97,6 +97,9 @@ DATABASES = {
 		'PASSWORD': logindetails.sql_password,
 		'HOST': logindetails.sql_host,
 		'PORT': logindetails.sql_port,
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
 	}
 }
 
