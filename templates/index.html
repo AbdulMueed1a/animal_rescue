@@ -1055,6 +1055,9 @@
                 <img src="https://cdn3.iconfinder.com/data/icons/picons-social/57/46-facebook-512.png"
                     alt="Facebook Logo">
             </a>
+            <form id="webpush-subscribe-form">
+                <button type="submit">Enable Push Notifications</button>
+            </form>
         </div>
         <div class="footerDescriptionBox">
             <div class="footerDescription">
@@ -1082,6 +1085,10 @@
     </footer>
 
     <script>
+         document.getElementById('webpush-subscribe-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            webPush.subscribeToPush();
+            });
         function toggleMenu() {
             const navLinks = document.querySelector('.navbar ul');
             navLinks.classList.toggle('active');

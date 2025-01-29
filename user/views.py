@@ -24,8 +24,10 @@ def generate_otp(length=6):
 def send_email(note,recipient_email):
     smtp_server = "smtp.gmail.com"  # Example: Gmail SMTP server
     smtp_port = 587  # Port for TLS
-    sender_email = os.environ.get("EMAIL_HOST_USER")
-    mail_pass = os.environ.get("EMAIL_HOST_PASSWORD")
+    # sender_email = os.environ.get("EMAIL_HOST_USER")
+    # mail_pass = os.environ.get("EMAIL_HOST_PASSWORD")
+    sender_email = logindetails.sender_email
+    mail_pass = logindetails.sender_password
     sub = "Your One-Time Password (OTP)"
     body = f"""
                This is your One-Time Password (OTP): {note}. Use it now to proceed with your request.
@@ -120,20 +122,25 @@ def otp(request):
 
 def login(request):
     if request.method == 'POST':
-        username=request.POST['Email_username']
-        password=request.POST['password']
+        username = request.POST['Email_username']
+        password = request.POST['password']
 
         if '@' in username:
             user = auth.authenticate(email=username, password=password)
         else:
             user = auth.authenticate(username=username, password=password)
+
         if user is not None:
             auth.login(request, user)
             next_url = request.GET.get("next", "/")  # Default to `/` if `next` is not provided
             return redirect(next_url)
+        else:
+            # Authentication failed, show an error message
+            messages.error(request, "Invalid username/email or password.")
+            return render(request, "login.html", {'error': 'Invalid credentials'})
 
     else:
-        return render(request,"login.html")
+        return render(request, "login.html")
 
 def logout(request):
     if request.user.is_authenticated:

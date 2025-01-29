@@ -5,180 +5,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{% static  "style/form.css" %}">
+    <title>Report Animal Condition</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
+<script>
+     window.onload = function() {
+            // Get today's date in YYYY-MM-DD format
+            var today = new Date().toISOString().split('T')[0];
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const citiesByDistrict = {
-                Sindh: ["Karachi", "Hyderabad", "Sukkur"],
-                Punjab: ["Lahore", "Faisalabad", "Rawalpindi"],
-                Balochistan: ["Quetta", "Gwadar", "Turbat"],
-                KPK: ["Peshawar", "Mardan", "Abbottabad"]
-            };
+            // Set the max attribute to today's date
+            var dateInput = document.getElementById("date");
+            dateInput.setAttribute('max', today);
 
-            function updateCities() {
-                const districtSelect = document.getElementById('district');
-                const citySelect = document.getElementById('city');
-                const selectedDistrict = districtSelect.value;
+            // Set the value of the input to today's date
+            dateInput.value = today;
+        };
+    // Initialize Web Push
+    const webPush = new WebPush({
+        serviceWorkerPath: "{% static 'js/service-worker.js' %}"
+    });
 
-                // Clear current city options
-                citySelect.innerHTML = '<option value="">Select City</option>';
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register("{% static 'js/service-worker.js' %}")
+            .then(function(registration) {
+                console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch(function(error) {
+                console.log('Service Worker registration failed:', error);
+            });
+    }
 
-                if (selectedDistrict && citiesByDistrict[selectedDistrict]) {
-                    citiesByDistrict[selectedDistrict].forEach(city => {
-                        const option = document.createElement('option');
-                        option.value = city;
-                        option.textContent = city;
-                        citySelect.appendChild(option);
-                    });
-                }
+    // Subscribe to Push Notifications
+    webPush.subscribeToPush();
+</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: url("{% static 'images/bg2.jpg' %}") no-repeat center center/cover;
+        }
+
+        .form-container {
+            background: #fff;
+            padding: 30px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input[type="radio"] {
+            margin-right: 10px; /* Adds space between the radio button and its label */
             }
 
-            document.getElementById('district').addEventListener('change', updateCities);
-;
-        });
-    </script>
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+
+        .form-group button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background: #ffb727;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background: #e0a121;
+        }
+
+        #map {
+            height: 200px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-
     <div class="form-container">
         <form id="reportForm" action="rescue_submit" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <h2>Report Animal Condition</h2>
             <div class="form-group">
-                <label for="name">Name : </label>
-                <input type="text" id="name" name="name" placeholder="Your Name" required>
+                <label for="animal">What Animal:</label>
+                <input type="text" id="animal" name="animal" required>
             </div>
             <div class="form-group">
-                <label for="email">Email : </label>
-                <input type="email" id="email" name="email" placeholder="Your Email" required>
+                <label for="contact">Contact Number:</label>
+                <input type="tel" id="contact" name="contact" required>
             </div>
             <div class="form-group">
-                <label for="animal">What Animal : </label>
-                <input type="text" id="animal" name="animal" placeholder="What animal" required>
+                <label for="contact">Select a date (optional):</label>
+                <input type="date" id="date" name="date">
             </div>
-            <div class="form-group">
-                <label for="contact">Contact Number : </label>
-                <input type="tel" id="contact" name="contact" placeholder="Your Contact Number" required>
-            </div>
-            <div class="form-group">
-                <label for="district">Provinces : </label>
-                <select id="district" name="district" required>
-                    <option value="">Select Provinces</option>
-                    <option value="Sindh">Sindh</option>
-                    <option value="Punjab">Punjab</option>
-                    <option value="Balochistan">Balochistan</option>
-                    <option value="KPK">KPK</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="city">City : </label>
-                <select id="city" name="city" required>
-                    <option value="">Select City</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="date">Date (Optional) : </label>
-                <input type="date" id="date" name="date" format="YYYY/MM/DD" default="now" >
-            </div>
-            <div class="form-group">
-                <label for="location">Location : </label>
-                <input type="text" id="address" name="address" placeholder="Written address or select from map" >
-                <div id="map" style="height: 200px; width: 25%; border: 10px; border-color: #a41515;"></div>
 
+            <div class="form-group">
+                <label>Location:</label>
+                <label style="display: inline-flex; margin-right: 10px; flex-direction: row; " >Enter Address Manually
+                    <input type="radio" id="manual" name="location_type" value="manual" checked  style="margin-left:5px;width: 15px;" >
+                    </label>
+                <label style="display: inline-flex; margin-right: 10px;flex-direction: row;">Use Map
+                    <input type="radio" id="mapOption" name="location_type" value="map" style="margin-left:5px;width: 15px;">
+                </label>
+                <span id="manual_map">
+                    <label for="city" style="padding-top: 10px" >City:</label>
+
+                    <select id="city" name="city" >
+                        <option value="">Select-City</option>
+                        <option value="Karachi">Karachi</option>
+                        <option value="Lahore">Lahore</option>
+                        <option value="Islamabad">Islamabad</option>
+                        <option value="Rawalpindi">Rawalpindi</option>
+                        <option value="Faisalabad">Faisalabad</option>
+                        <option value="Peshawar">Peshawar</option>
+                        <option value="Quetta">Quetta</option>
+                        <option value="Multan">Multan</option>
+                        <option value="Sialkot">Sialkot</option>
+                        <option value="Hyderabad">Hyderabad</option>
+                        <option value="Sukkur">Sukkur</option>
+                        <option value="Gujranwala">Gujranwala</option>
+                        <option value="Bahawalpur">Bahawalpur</option>
+                        <option value="Abbottabad">Abbottabad</option>
+                        <option value="Sargodha">Sargodha</option>
+                        <option value="Gujrat">Gujrat</option>
+                        <option value="Mardan">Mardan</option>
+                        <option value="Rahim Yar Khan">Rahim Yar Khan</option>
+                        <option value="Sahiwal">Sahiwal</option>
+                        <option value="Okara">Okara</option>
+                        <option value="Mirpur">Mirpur</option>
+                        <option value="Jhelum">Jhelum</option>
+                        <option value="Mansehra">Mansehra</option>
+                        <option value="Swat">Swat</option>
+                        <option value="Muzaffarabad">Muzaffarabad</option>
+                        <option value="Larkana">Larkana</option>
+                        <option value="Sheikhupura">Sheikhupura</option>
+                        <option value="Dera Ghazi Khan">Dera Ghazi Khan</option>
+                        <option value="Chiniot">Chiniot</option>
+                        <option value="Tando Adam">Tando Adam</option>
+                        <option value="Nawabshah">Nawabshah</option>
+                        <option value="Kohat">Kohat</option>
+                        <option value="Dera Ismail Khan">Dera Ismail Khan</option>
+                        <option value="Bannu">Bannu</option>
+                        <option value="Khuzdar">Khuzdar</option>
+                        <option value="Hafizabad">Hafizabad</option>
+                        <option value="Turbat">Turbat</option>
+                        <option value="Kasur">Kasur</option>
+                        <option value="Jhang">Jhang</option>
+                        <option value="Vehari">Vehari</option>
+                        <option value="Gojra">Gojra</option>
+                        <option value="Mingora">Mingora</option>
+                        <option value="Kandhkot">Kandhkot</option>
+                        <option value="Jacobabad">Jacobabad</option>
+                        <option value="Shikarpur">Shikarpur</option>
+                        <option value="Bhakkar">Bhakkar</option>
+                        <option value="Badin">Badin</option>
+                        <option value="Attock">Attock</option>
+                        <option value="Jaranwala">Jaranwala</option>
+                        <option value="Kotri">Kotri</option>
+                        <option value="Chaman">Chaman</option>
+                        <option value="Pakpattan">Pakpattan</option>
+                        <option value="Mandi Bahauddin">Mandi Bahauddin</option>
+                        <option value="Kamoke">Kamoke</option>
+                        <option value="Kharian">Kharian</option>
+                        <option value="Haripur">Haripur</option>
+                        <option value="Daska">Daska</option>
+                        <option value="Charsadda">Charsadda</option>
+                        <option value="Muzaffargarh">Muzaffargarh</option>
+                        <option value="Toba Tek Singh">Toba Tek Singh</option>
+                        <option value="Hangu">Hangu</option>
+                        <option value="Lodhran">Lodhran</option>
+                        <option value="Shahdadkot">Shahdadkot</option>
+                        <option value="Umerkot">Umerkot</option>
+                        <option value="Mastung">Mastung</option>
+                        <option value="Narowal">Narowal</option>
+                        <option value="Kot Addu">Kot Addu</option>
+                        <option value="Shahkot">Shahkot</option>
+                        <option value="Kamalia">Kamalia</option>
+                    </select>
+                    <label for="address" style="padding-top:10px">Street Address:</label>
+                    <input type="text" id="address" name="address" placeholder="Enter address">
+                </span>
+                <div id="map"></div>
                 <input type="hidden" name="latitude" id="latitude">
                 <input type="hidden" name="longitude" id="longitude">
+            </div>
             <div class="form-group">
-                <label for="condition">Condition of the Animal : </label>
+                <label for="condition">Condition of the Animal:</label>
                 <select id="condition" name="condition" required>
                     <option value="critical">Critical</option>
                     <option value="urgent">Urgent</option>
-                    <option value="Bleeding">Bleeding</option>
-                    <option value="Fractures or Broken Bones">Fractures or Broken Bones</option>
-                    <option value="Poisoned">Poisoned</option>
+                    <option value="bleeding">Bleeding</option>
+                    <option value="fractures">Fractures</option>
+                    <option value="poisoned">Poisoned</option>
                     <option value="not-sure">Not Sure</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="image">Image : </label>
+                <label for="image">Image:</label>
                 <input type="file" id="image" name="image" accept="image/*">
             </div>
             <div class="form-group">
-                <label for="description">Description : </label>
-                <textarea id="description" name="description" placeholder="Provide a brief description"
-                    required></textarea>
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" style="resize: none" required></textarea>
             </div>
             <div class="form-group">
-                <button type="submit">Submit Report : </button>
+                <button type="submit">Submit Report</button>
             </div>
         </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mapDiv = document.getElementById('map');
+            const addressInput = document.getElementById('manual_map');
+            const manualOption = document.getElementById('manual');
+            const mapOption = document.getElementById('mapOption');
+            let map, marker;
 
-        <script>
-            const map = L.map('map').setView([30.3753, 69.3451], 6); // Default location: Pakistan
+            function initializeMap() {
+                map = L.map('map').setView([30.3753, 69.3451], 6);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 18,
+                }).addTo(map);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 18,
-            }).addTo(map);
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        map.setView([latitude, longitude], 13);
+                        marker = L.marker([latitude, longitude]).addTo(map);
+                        document.getElementById('latitude').value = latitude;
+                        document.getElementById('longitude').value = longitude;
+                    },
+                    (error) => {
+                        console.error('Error getting location:', error);
+                    },
+                    { enableHighAccuracy: true }
+                );
 
-            let marker;
+                map.on('click', function (e) {
+                    const { lat, lng } = e.latlng;
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lng;
+                    if (marker) {
+                        marker.setLatLng(e.latlng);
+                    } else {
+                        marker = L.marker(e.latlng).addTo(map);
+                    }
+                });
+            }
 
-            // Handle map clicks
-            map.on('click', function (e) {
-                const { lat, lng } = e.latlng;
 
-                // Update the hidden input fields
-                document.getElementById('latitude').value = lat;
-                document.getElementById('longitude').value = lng;
-
-                // Add or update marker
-                if (marker) {
-                    marker.setLatLng(e.latlng);
-                } else {
-                    marker = L.marker(e.latlng).addTo(map);
-                }
-            });
-
-            // Auto-detect location
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-
-                    // Center the map and add a marker
-                    map.setView([latitude, longitude], 13);
-                    marker = L.marker([latitude, longitude]).addTo(map);
-
-                    // Update the hidden input fields
-                    document.getElementById('latitude').value = latitude;
-                    document.getElementById('longitude').value = longitude;
-                },
-                (error) => {
-                    console.error('Error getting location:', error);
-                },
-                { enableHighAccuracy: true }
-            );
-
-            // Prevent form submission if coordinates are empty
-            document.getElementById('reportForm').addEventListener('submit', function (event) {
-                const latitude = document.getElementById('latitude').value;
-                const longitude = document.getElementById('longitude').value;
-
-                if (!latitude || !longitude) {
-                    alert('Please select a location on the map.');
-                    event.preventDefault(); // Stop form submission
-                }
-            });
+            mapOption.addEventListener('change', () => { mapDiv.style.display = 'block'; addressInput.style.display = 'none';initializeMap(); });
+            manualOption.addEventListener('change', () => { mapDiv.style.display = 'none'; addressInput.style.display = 'block'; });
+        });
 
 
 
     </script>
-    </div>
-
-
-
 </body>
-
 </html>

@@ -5,115 +5,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>signup</title>
-{#    <link rel="stylesheet" href="{% static 'style/signup.css'%}">#}
-<style>
-* {
-    padding: 0;
-    font-family: sans-serif;
-    box-sizing: border-box;
-}
+    <title>Signup</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: sans-serif;
+            box-sizing: border-box;
+        }
 
-body {
-    padding-bottom: 150px;
-    background: url("{% static 'images/bg2.jpg'%}");
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-size: cover;
-    background-repeat: no-repeat;
-    overflow: hidden;
-}
+        body {
+            background: url("{% static 'images/bg2.jpg'%}");
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-size: cover;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
 
-.box .form h1{
-    text-align: center;
-}
+        .box {
+            padding: 20px 30px;
+            width: 350px;
+            backdrop-filter: blur(50px);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            color: #000000;
+        }
 
-.box {
-    padding: 20px 30px;
-    width: 300px;
-    height: auto;
-    backdrop-filter: blur(50px);
-    border-top-left-radius: 15px;
-    border-bottom-left-radius: 15px;
-    background: rgb(255, 255, 255);
-    box-shadow: -10px 8px 15px rgba(0, 0, 0, 0.1); /*Add shadow here*/
-    color: #000000;
-}
+        .box h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
+        .inputbox {
+            margin-bottom: 15px;
+        }
 
-.box2 {
-    padding: 20px 30px;
-    width: 300px;
-    height: fit-content;
-    backdrop-filter: blur(50px);
-    border-top-right-radius: 15px;
-    border-bottom-right-radius: 15px;
-    background: rgb(255, 255, 255);
-    box-shadow: 10px 8px 15px rgba(0, 0, 0, 0.1 ); /* Shift shadow to the right */
-    display: flex;
-    justify-content: center;
-    position: relative; /* Required for the pseudo-element*/
-}
-@media(max-width: 600px) {
-     .box2{
-         display: none;
-     }
-    .box{
-        height:auto;
-    }
-}
-.image1{
-    transform: scaleX(-1);
+        .inputbox label {
+            color: #000000;
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: block;
+        }
 
-}
+        .inputbox input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            font-size: 14px;
+        }
 
-.inputbox {
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-}
+        .inputbox input:focus {
+            border-color: #ffb727;
+        }
 
-.inputbox label {
-    color: #000000;
-    margin-bottom: 5px;
-}
+        .password-strength {
+            margin-top: 5px;
+            height: 5px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
 
-.inputbox input {
-    padding: 5px 20px;
-    border: none;
-    outline: none;
-    background: none;
-    border-bottom: 1px solid #12151e;
-    color: #000000;
-}
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            background: red;
+            transition: width 0.3s ease;
+        }
 
-.sub {
-    margin-left: 15px;
-    padding: 10px 80px;
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    outline: none;
-    background: #ffb727;
-    cursor: pointer;
-    font-size: 16px;
-}
-</style>
+        .password-strength-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .sub {
+            width: 100%;
+            padding: 10px;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            outline: none;
+            background: #ffb727;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .sub:hover {
+            background: #e0a020;
+        }
+
+        .box2 {
+            display: none; /* Hide the image box on all screens */
+        }
+
+        @media (min-width: 768px) {
+            .box2 {
+                display: block; /* Show the image box on larger screens */
+                padding: 20px 30px;
+                width: 300px;
+                backdrop-filter: blur(50px);
+                border-radius: 15px;
+                background: rgba(255, 255, 255, 0.9);
+                box-shadow: 10px 8px 15px rgba(0, 0, 0, 0.1);
+                margin-left: 20px;
+            }
+
+            .image1 {
+                width: 100%;
+                height: auto;
+                transform: scaleX(-1);
+            }
+        }
+
+        h6 {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        h6 a {
+            color: #ffb727;
+            text-decoration: none;
+        }
+
+        h6 a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
-
 
 <body>
     <div class="box">
         <div class="form">
-            <h1>SignUp</h1>
+            <h1>Sign Up</h1>
             <form method="post" action="signup">
-
-            {% csrf_token %}
-                 <div>
+                {% csrf_token %}
+                <div>
                     {% for message in messages %}
-                    <p>{{message}}</p>
+                    <p>{{ message }}</p>
                     {% endfor %}
                 </div>
                 <div class="inputbox">
@@ -125,35 +162,77 @@ body {
                     <input type="text" id="last_name" name="last_name" required>
                 </div>
                 <div class="inputbox">
-                    <label for="username">UserName</label>
+                    <label for="username">Username</label>
                     <input type="text" id="username" name="username" required>
                 </div>
-
-
                 <div class="inputbox">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
                 </div>
-
                 <div class="inputbox">
                     <label for="password1">Password</label>
                     <input type="password" id="password1" name="password1" required>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="password-strength-bar"></div>
+                    </div>
+                    <div class="password-strength-text" id="password-strength-text"></div>
                 </div>
                 <div class="inputbox">
-                    <label for="password2">Confrim Password</label>
+                    <label for="password2">Confirm Password</label>
                     <input type="password" id="password2" name="password2" required>
                 </div>
-
-                <h6>already  have a Accout?
-                    <a href="login">Login</a>
-                </h6>
-                <input type="submit" value="submit" class="sub" id="submit">    
+                <h6>Already have an account? <a href="login">Login</a></h6>
+                <input type="submit" value="Submit" class="sub" id="submit">
             </form>
         </div>
     </div>
     <div class="box2">
         <img src="{% static 'images/character.png' %}" alt="" class="image1">
     </div>
+
+    <script>
+        const passwordInput = document.getElementById('password1');
+        const strengthBar = document.getElementById('password-strength-bar');
+        const strengthText = document.getElementById('password-strength-text');
+
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            const strength = calculatePasswordStrength(password);
+
+            strengthBar.style.width = `${strength * 25}%`;
+            strengthBar.style.backgroundColor = getStrengthColor(strength);
+            strengthText.textContent = getStrengthText(strength);
+        });
+
+        function calculatePasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^A-Za-z0-9]/)) strength++;
+            return strength;
+        }
+
+        function getStrengthColor(strength) {
+            switch (strength) {
+                case 1: return 'red';
+                case 2: return 'orange';
+                case 3: return 'yellow';
+                case 4: return 'green';
+                default: return 'red';
+            }
+        }
+
+        function getStrengthText(strength) {
+            switch (strength) {
+                case 1: return 'Weak';
+                case 2: return 'Moderate';
+                case 3: return 'Strong';
+                case 4: return 'Very Strong';
+                default: return '';
+            }
+        }
+    </script>
 </body>
 
 </html>

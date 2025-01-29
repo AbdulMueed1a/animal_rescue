@@ -5,29 +5,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>otp</title>
-    <link rel="stylesheet" href="{% static 'style/login.css'%}">
+    <title>OTP Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: url("{% static 'images/bg2.jpg' %}") no-repeat center center/cover;
+        }
+
+        .container {
+            display: flex;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .box {
+            padding: 30px;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .box h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .inputbox {
+            margin-bottom: 20px;
+        }
+
+        .inputbox label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .inputbox input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .sub {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background: #ffb727;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .sub:hover {
+            background: #e0a121;
+        }
+
+        .box2 {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 320px;
+            background: #f8f9fa;
+        }
+
+        .box2 img {
+            max-width: 80%;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="box">
-        <div class="form">
-            <h1>Enter Your Fucking Otp Here</h1>
+    <div class="container">
+        <div class="box">
+            <h1>OTP Verification</h1>
             <form method="post" action="otp">
                 {% csrf_token %}
                 <div class="inputbox">
-                    <label for="otp">Enter your 6 digit otp recieved on {{ email }}</label>
-                    <input type="otp" id="otp" name="otp" required>
+                    <label for="otp">Enter the 6-digit OTP sent to {{ email }}</label>
+                    <input type="text" id="otp" name="otp" required pattern="\d{6}" title="Please enter a 6-digit OTP">
                 </div>
-{#                <h6>Don't have a Accout? Create one now!#}
-{#                    <a href="signup.html">SignUp</a>#}
-{#                </h6>#}
-                <input type="submit" value="submit" class="sub" id="submit">
+                <input type="submit" value="Verify OTP" class="sub">
             </form>
         </div>
-    </div>
-    <div class="box2">
-        <img src="{% static "images/character.png" %}" alt="" class="image1">
+        <div class="box2">
+            <img src="{% static 'images/character.png' %}" alt="Verification Illustration">
+        </div>
     </div>
 </body>
 

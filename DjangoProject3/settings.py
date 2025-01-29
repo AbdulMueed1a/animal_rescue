@@ -29,12 +29,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("KEY")
+SECRET_KEY = logindetails.key
+# SECRET_KEY = os.environ.get("KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG","false").lower()=="true"
+DEBUG = "True"
+# DEBUG = os.environ.get("DEBUG","false").lower()=="true"
 
-ALLOWED_HOSTS = [".vercel.app"]
+ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = [".vercel.app"]
 
 SITE_ID = 1
 
@@ -44,6 +47,7 @@ SITE_ID = 1
 INSTALLED_APPS = [
     'rescueform.apps.RescueformConfig',
     'user.apps.UserConfig',
+    'webpush',
     'Animalrescue_project.apps.AnimalreascueProjectConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -54,6 +58,11 @@ INSTALLED_APPS = [
     'django.contrib.sites'
 ]
 
+WEBPUSH_SETTINGS = {
+    "VAPID_PUBLIC_KEY": f"{logindetails.vapidpublickey}",
+    "VAPID_PRIVATE_KEY": f"{logindetails.vapidprivatekey}",
+    "VAPID_ADMIN_EMAIL": f"{logindetails.sender_email}"
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -104,8 +113,11 @@ WSGI_APPLICATION = 'DjangoProject3.wsgi.application'
 # 	}
 # }
 # database = DATABASES['default']=dj_database_url.parse(f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require")
+# POSTGRES_DATABASE = dj_database_url.parse(
+#     f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
+# )
 POSTGRES_DATABASE = dj_database_url.parse(
-    f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
+    f"postgresql://{logindetails.neonuser}:{logindetails.neonpassword}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
 )
 DATABASES = {'default': POSTGRES_DATABASE}
 
