@@ -103,8 +103,8 @@ def rescue_submit(request):
 @login_required(login_url='/login/')
 def my_reports(request):
     # return render(request, "reportDashboard.html", {})
-    submissions = list(chain(submission.objects.filter(email=request.user.email) , submission.objects.filter(username=request.user.username)))
-    submissions.sort(key=lambda x: x.id, reverse=True)
+    submissions =  submission.objects.filter(username=request.user.username).order_by("-id")
+
     subs = submission.objects.filter(latitude__isnull=False, longitude__isnull=False)
     location_data=[{'latitude':sub.latitude,'longitude':sub.longitude} for sub in subs]
     return render(request, 'reportDashboard.html', {'usersubm': submissions,'storedReports': submission.objects.all().order_by("-id"), 'location_data': location_data})

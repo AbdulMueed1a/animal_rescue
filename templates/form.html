@@ -147,15 +147,14 @@
             <div class="form-group">
                 <label>Location:</label>
                 <label style="display: inline-flex; margin-right: 10px; flex-direction: row; " >Enter Address Manually
-                    <input type="radio" id="manual" name="location_type" value="manual" checked  style="margin-left:5px;width: 15px;" >
+                    <input type="radio" id="manual" name="location_type" value="manual" style="margin-left:5px;width: 15px;" >
                     </label>
                 <label style="display: inline-flex; margin-right: 10px;flex-direction: row;">Use Map
-                    <input type="radio" id="mapOption" name="location_type" value="map" style="margin-left:5px;width: 15px;">
+                    <input type="radio" id="mapOption" name="location_type" value="map" checked style="margin-left:5px;width: 15px;">
                 </label>
                 <span id="manual_map">
                     <label for="city" style="padding-top: 10px" >City:</label>
-
-                    <select id="city" name="city" >
+                    <select id="city" name="city" class="manualmap">
                         <option value="">Select-City</option>
                         <option value="Karachi">Karachi</option>
                         <option value="Lahore">Lahore</option>
@@ -227,12 +226,12 @@
                         <option value="Shahkot">Shahkot</option>
                         <option value="Kamalia">Kamalia</option>
                     </select>
-                    <label for="address" style="padding-top:10px">Street Address:</label>
-                    <input type="text" id="address" name="address" placeholder="Enter address">
+                    <label for="address" class="manualmap" style="padding-top:10px">Street Address:</label>
+                    <input type="text" id="address" class="manualmap" name="address" placeholder="Enter address">
                 </span>
                 <div id="map"></div>
-                <input type="hidden" name="latitude" id="latitude">
-                <input type="hidden" name="longitude" id="longitude">
+                <input type="hidden" name="latitude" id="latitude" class="automap">
+                <input type="hidden" name="longitude" id="longitude" class="autoamap">
             </div>
             <div class="form-group">
                 <label for="condition">Condition of the Animal:</label>
@@ -247,7 +246,7 @@
             </div>
             <div class="form-group">
                 <label for="image">Image:</label>
-                <input type="file" id="image" name="image" accept="image/*">
+                <input type="file" id="image" name="image" accept="image/*" required title="bro add file">
             </div>
             <div class="form-group">
                 <label for="description">Description:</label>
@@ -259,52 +258,125 @@
         </form>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const mapDiv = document.getElementById('map');
-            const addressInput = document.getElementById('manual_map');
-            const manualOption = document.getElementById('manual');
-            const mapOption = document.getElementById('mapOption');
-            let map, marker;
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('reportForm');
+        const mapDiv = document.getElementById('map');
+        const addressInput = document.getElementById('manual_map');
+        const manualOption = document.getElementById('manual');
+        const mapOption = document.getElementById('mapOption');
+        const manualOptionInputs = document.getElementsByClassName('manualmap');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+        let map, marker;
 
-            function initializeMap() {
-                map = L.map('map').setView([30.3753, 69.3451], 6);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 18,
-                }).addTo(map);
+        // Create validation message element
+        const mapValidationMessage = document.createElement('div');
+        mapValidationMessage.id = 'map-validation-message';
+        mapValidationMessage.style.display = 'none';
+        mapValidationMessage.style.color = '#dc3545';
+        mapValidationMessage.style.fontSize = '0.875em';
+        mapValidationMessage.style.marginTop = '0.25rem';
+        mapDiv.parentNode.insertBefore(mapValidationMessage, mapDiv.nextSibling);
 
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const { latitude, longitude } = position.coords;
-                        map.setView([latitude, longitude], 13);
-                        marker = L.marker([latitude, longitude]).addTo(map);
-                        document.getElementById('latitude').value = latitude;
-                        document.getElementById('longitude').value = longitude;
-                    },
-                    (error) => {
-                        console.error('Error getting location:', error);
-                    },
-                    { enableHighAccuracy: true }
-                );
+        // Map initialization function
+        function initializeMap() {
+            if (map) map.remove();
 
-                map.on('click', function (e) {
-                    const { lat, lng } = e.latlng;
-                    document.getElementById('latitude').value = lat;
-                    document.getElementById('longitude').value = lng;
-                    if (marker) {
-                        marker.setLatLng(e.latlng);
-                    } else {
-                        marker = L.marker(e.latlng).addTo(map);
-                    }
-                });
+            map = L.map('map').setView([30.3753, 69.3451], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+            }).addTo(map);
+
+            latitudeInput.value = '';
+            longitudeInput.value = '';
+            mapValidationMessage.style.display = 'none';
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    updateMapPosition(latitude, longitude);
+                },
+                (error) => {
+                    console.error('Geolocation error:', error);
+                    mapValidationMessage.textContent = 'Please click on the map to set location';
+                    mapValidationMessage.style.display = 'block';
+                },
+                { enableHighAccuracy: true }
+            );
+
+            map.on('click', function (e) {
+                const { lat, lng } = e.latlng;
+                updateMapPosition(lat, lng);
+                mapValidationMessage.style.display = 'none';
+            });
+        }
+
+        function updateMapPosition(lat, lng) {
+            latitudeInput.value = lat;
+            longitudeInput.value = lng;
+            if (marker) {
+                marker.setLatLng([lat, lng]);
+            } else {
+                marker = L.marker([lat, lng]).addTo(map);
             }
+            map.setView([lat, lng], 15);
+        }
 
-
-            mapOption.addEventListener('change', () => { mapDiv.style.display = 'block'; addressInput.style.display = 'none';initializeMap(); });
-            manualOption.addEventListener('change', () => { mapDiv.style.display = 'none'; addressInput.style.display = 'block'; });
+        // Form submission handler
+        form.addEventListener('submit', function (e) {
+            if (mapOption.checked) {
+                if (!latitudeInput.value || !longitudeInput.value) {
+                    e.preventDefault();
+                    mapValidationMessage.textContent = 'Please set location on the map';
+                    mapValidationMessage.style.display = 'block';
+                    mapDiv.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                        inline: 'nearest'
+                    });
+                    return false;
+                }
+            }
+            return true;
         });
 
+        // Radio button change handlers
+        mapOption.addEventListener('change', () => {
+            mapDiv.style.display = 'block';
+            addressInput.style.display = 'none';
+            mapValidationMessage.style.display = 'none';
 
+            Array.from(manualOptionInputs).forEach(input => {
+                input.value = '';
+                input.removeAttribute('required');
+            });
 
-    </script>
+            initializeMap();
+        });
+
+        manualOption.addEventListener('change', () => {
+            mapDiv.style.display = 'none';
+            addressInput.style.display = 'block';
+            mapValidationMessage.style.display = 'none';
+
+            latitudeInput.value = '';
+            longitudeInput.value = '';
+
+            Array.from(manualOptionInputs).forEach(input => {
+                input.setAttribute('required', 'required');
+            });
+        });
+
+        // Initial setup
+        const initiallyChecked = document.querySelector('input[name="location_type"]:checked');
+        if (initiallyChecked) initiallyChecked.dispatchEvent(new Event('change'));
+
+        // Date input setup
+        const today = new Date().toISOString().split('T')[0];
+        const dateInput = document.getElementById("date");
+        dateInput.setAttribute('max', today);
+        dateInput.value = today;
+    });
+</script>
 </body>
 </html>
