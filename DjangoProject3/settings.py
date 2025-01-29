@@ -44,7 +44,6 @@ SITE_ID = 1
 INSTALLED_APPS = [
     'rescueform.apps.RescueformConfig',
     'user.apps.UserConfig',
-    "webpush",
     'Animalrescue_project.apps.AnimalreascueProjectConfig',
     'django.contrib.admin',
     'django.contrib.auth',
