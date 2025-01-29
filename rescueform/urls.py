@@ -10,5 +10,5 @@ urlpatterns = [
     path('form', views.form , name='form'),
     path('', views.index , name='home'),
     path('rescue_submit', views.rescue_submit , name='submit'),
-    path('dasboard/', views.my_reports ),
+    path('dashboard/', views.my_reports ),
 ]
