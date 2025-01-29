@@ -18,7 +18,7 @@ db.sqlite3
 media/
 staticfiles/
 credentials/
-static/
+assets/
 */migrations/*.py
 !*/migrations/__init__.py
 
