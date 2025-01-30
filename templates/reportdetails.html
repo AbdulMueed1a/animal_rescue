@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .image-section {
+            width: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+        }
+
+        .image-section img {
+            width: 75%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .details-section {
+            width: 50%;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .about_report {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .card {
+            min-width: 150px;
+            cursor: pointer;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                gap: 20px;
+
+            }
+
+            .image-section,
+            .details-section {
+                width: 100%;
+            }
+
+            .card {
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="image-section">
+            <img id="product-image" src="https://m.media-amazon.com/images/I/71bug9J4YOL._AC_SL1500_.jpg" alt="Product">
+        </div>
+        <div class="details-section">
+            <h1 id="about-report" class="about_report">About Report</h1>
+            <!-- Contact Number -->
+            <h3>Reporter Contect No</h3>
+            <p id="contect-no" class="contect-no">contect-no</p>
+            <!-- Reporter Emial -->
+            <h3>Reporter Email</h3>
+            <p id="reporter-email" class="reporter-email">reporter-email.</p>
+            <!-- Select a date (optional): -->
+            <h3>Report Date</h3>
+            <p id="report-date" class="report-date">report-date.</p>
+            <!-- City: -->
+            <h3>City</h3>
+            <p id="city" class="city">city.</p>
+            <!-- Location: -->
+            <h3>Address</h3>
+            <p id="address" class="address">address.</p>
+            <!-- What Animal -->
+            <h3>Animal Kind</h3>
+            <p id="animal-kind" class="animal-kind">animal-kind.</p>
+            <!-- Condition of the Animal: -->
+            <h3>Animal Condition</h3>
+            <p id="condition" class="condition">condition.</p>
+            <!-- Description: -->
+            <h3>Other Details</h3>
+            <p id="product-description" class="product-description">Lorem ipsum dolor sit amet consectetur adipisicing
+                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
+                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
+                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
+                officia.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
+                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
+                est corrupti accusamus cum aspernatur.Lorem ipsum dolor sit amet consectetur adipisicing
+                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
+                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
+                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
+                officia.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
+                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
+                est corrupti accusamus cum aspernatur.Lorem ipsum dolor sit amet consectetur adipisicing
+                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
+                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
+                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
+                officia.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
+                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
+                est corrupti accusamus cum aspernatur.Lorem ipsum dolor sit amet consectetur adipisicing
+                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
+                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
+                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
+                officia.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
+                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
+                est corrupti accusamus cum aspernatur.Lorem ipsum dolor sit amet consectetur adipisicing
+                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
+                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
+                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
+                officia.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
+                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
+                est corrupti accusamus cum aspernatur.Lorem ipsum dolor sit amet consectetur adipisicing
+                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
+                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
+                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
+                officia.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
+                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
+                est corrupti accusamus cum aspernatur.</p>
+        </div>
+    </div>
+</body>
+
+</html>
+
