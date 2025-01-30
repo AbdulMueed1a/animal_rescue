@@ -36,8 +36,13 @@ SECRET_KEY = logindetails.key
 DEBUG = "True"
 # DEBUG = os.environ.get("DEBUG","false").lower()=="true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["a135-2404-3100-140d-ffb7-bc0e-36d5-6338-1b66.ngrok-free.app" , "127.0.0.1" ,"localhost"]
 # ALLOWED_HOSTS = [".vercel.app"]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://a135-2404-3100-140d-ffb7-bc0e-36d5-6338-1b66.ngrok-free.app',  # Add your ngrok URL with HTTPS
+    'http://localhost:8000',  # Include localhost for non-HTTPS testing
+]
 
 SITE_ID = 1
 
@@ -47,7 +52,6 @@ SITE_ID = 1
 INSTALLED_APPS = [
     'rescueform.apps.RescueformConfig',
     'user.apps.UserConfig',
-    'webpush',
     'Animalrescue_project.apps.AnimalreascueProjectConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -58,11 +62,7 @@ INSTALLED_APPS = [
     'django.contrib.sites'
 ]
 
-WEBPUSH_SETTINGS = {
-    "VAPID_PUBLIC_KEY": f"{logindetails.vapidpublickey}",
-    "VAPID_PRIVATE_KEY": f"{logindetails.vapidprivatekey}",
-    "VAPID_ADMIN_EMAIL": f"{logindetails.sender_email}"
-}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

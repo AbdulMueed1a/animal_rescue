@@ -1,16 +1,13 @@
-import os
-import time
-from contextlib import nullcontext
+import json
 
-from django.db.models import Q
-
-from django.http import JsonResponse, HttpResponseForbidden
-from django.shortcuts import render, redirect, get_object_or_404
-from itertools import chain
 import requests
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import submission
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import FCMToken
 
 # Create your views here.
 def form(request):
@@ -20,10 +17,6 @@ def form(request):
     #     return redirect('../user/login')
 def index(request):
     return render(request, 'index.html')
-
-
-import requests
-
 
 def reverse_geocode(lat, lon, city=False):
     url = "https://nominatim.openstreetmap.org/reverse"
@@ -60,8 +53,21 @@ def reverse_geocode(lat, lon, city=False):
         print("Error during reverse geocoding:", e)
         return "Unknown" if city else "Address not found"
 
+@csrf_exempt
+def save_fcm_token(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            token = data.get('token')
+            user = request.user
+            FCMToken.objects.update_or_create(user=user, defaults={'token': token})
+            print(f"Token saved for {user.username}: {token}")  # Check terminal logs
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            print("Error saving token:", str(e))  # Debug errors
+            return JsonResponse({'status': 'error'}, status=400)
 
-# @login_required(login_url='/login/')
+@login_required(login_url='/login/')
 def rescue_submit(request):
     subm = submission()
     if request.method == "POST":
@@ -97,6 +103,7 @@ def rescue_submit(request):
 
         subm.save()
         image_path = subm.image.path
+
         return redirect('dashboard/')
 
 

@@ -21,24 +21,8 @@
             // Set the value of the input to today's date
             dateInput.value = today;
         };
-    // Initialize Web Push
-    const webPush = new WebPush({
-        serviceWorkerPath: "{% static 'js/service-worker.js' %}"
-    });
 
-    // Register Service Worker
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register("{% static 'js/service-worker.js' %}")
-            .then(function(registration) {
-                console.log('Service Worker registered with scope:', registration.scope);
-            })
-            .catch(function(error) {
-                console.log('Service Worker registration failed:', error);
-            });
-    }
 
-    // Subscribe to Push Notifications
-    webPush.subscribeToPush();
 </script>
     <style>
         * {
@@ -257,6 +241,29 @@
             </div>
         </form>
     </div>
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyA80SmOpP14bbtiVj2OA363_Cp8Hm0_W50",
+    authDomain: "animal-rescue-portal.firebaseapp.com",
+    projectId: "animal-rescue-portal",
+    storageBucket: "animal-rescue-portal.firebasestorage.app",
+    messagingSenderId: "833958160499",
+    appId: "1:833958160499:web:3e651a4a2bbf1f76692206",
+    measurementId: "G-4DDP7997KY"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('reportForm');
