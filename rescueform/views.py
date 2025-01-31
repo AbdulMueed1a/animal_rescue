@@ -1,5 +1,5 @@
 import json
-
+from .firebase import initialize_firebase
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import submission
@@ -11,12 +11,17 @@ from .models import FCMToken
 
 # Create your views here.
 def form(request):
-    # if request.user.is_authenticated:
-        return render(request,'form.html')
-    # else:
-    #     return redirect('../user/login')
+    try:
+        initialize_firebase()
+    except:
+     int(1+1)
+    return render(request,'form.html')
+
 def index(request):
     return render(request, 'index.html')
+
+def aboutus(request):
+    return render(request, 'aboutus.html')
 
 def reverse_geocode(lat, lon, city=False):
     url = "https://nominatim.openstreetmap.org/reverse"
@@ -67,6 +72,76 @@ def save_fcm_token(request):
             print("Error saving token:", str(e))  # Debug errors
             return JsonResponse({'status': 'error'}, status=400)
 
+
+@csrf_exempt
+@login_required
+def update_fcm_token(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            new_token = data.get("token")
+
+            if not new_token:
+                return JsonResponse({"error": "No token provided"}, status=400)
+
+            # Update or create the token
+            FCMToken.objects.update_or_create(user=request.user, defaults={"token": new_token})
+
+            return JsonResponse({"message": "FCM token updated successfully"})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+def push_noti(self):
+    import random
+    from .utils import send_fcm_notification
+    titles = [
+        "🐾 A Little Friend Needs Help! 🐾",
+        "🚨 Emergency: Animal in Distress! 🚨",
+        "❤️🩹 A Furry Friend Needs You! ❤️🩹",
+        "🐾 Help a Soul in Need! 🐾",
+        "⚠️ Urgent: Animal Rescue Needed! ⚠️",
+        "🐾 A Life is Waiting for You! 🐾",
+        "❤️ A Precious Creature Needs Aid! ❤️",
+        "🐾 Can You Be Their Hero? 🐾",
+        "🚨 Quick! An Animal Needs Rescue! 🚨",
+        "🐾 A Little Paw Needs Your Help! 🐾"
+    ]
+    bodies = [
+        f"{random.choice(['😢', '🩹', '❤️🩹'])} {self.username} spotted an injured {self.animal  or 'animal'} nearby! "
+        f"Can you check the details? Every minute matters...",
+        f"A little {self.animal or 'creature'} is in trouble near {self.address}. "
+        f"{random.choice(['Please lend a hand!', 'Your help could save a life!'])}",
+        f"🚨 Emergency! A {self.animal  or 'helpless animal'} needs immediate assistance at {self.address}. "
+        f"{random.choice(['Can you help?', 'Your kindness could save them!'])}",
+        f"❤️ A {self.animal  or 'sweet soul'} is in pain near {self.address}. "
+        f"{random.choice(['Can you be their hero?', 'Your action could make all the difference!'])}",
+        f"🐾 A {self.animal  or 'little friend'} is hurt and needs your help at {self.address}. "
+        f"{random.choice(['Please act quickly!', 'Every second counts!'])}",
+        f"⚠️ Urgent! A {self.animal  or 'vulnerable animal'} needs rescue at {self.address}. "
+        f"{random.choice(['Can you assist?', 'Your help could save a life!'])}",
+        f"😢 A {self.animal  or 'poor creature'} is suffering near {self.address}. "
+        f"{random.choice(['Can you lend a hand?', 'Your kindness could save them!'])}",
+        f"🐾 A {self.animal  or 'little paw'} needs your help at {self.address}. "
+        f"{random.choice(['Please act now!', 'Your action could save a life!'])}",
+        f"❤️🩹 A {self.animal  or 'helpless animal'} is in distress near {self.address}. "
+        f"{random.choice(['Can you help?', 'Your kindness could save them!'])}",
+        f"🚨 Quick! A {self.animal  or 'little friend'} needs rescue at {self.address}. "
+        f"{random.choice(['Can you assist?', 'Your help could save a life!'])}"
+    ]
+
+    from django.contrib.auth.models import User
+    # Only send to users with FCM tokens
+    users_with_tokens = User.objects.filter(fcmtoken__isnull=False).distinct()
+    for user in users_with_tokens:
+        send_fcm_notification(
+            user=user,
+            title=random.choice(titles),
+            body=random.choice(bodies),
+            url=f"/dashboard/{self.id}/"
+        )
+
 @login_required(login_url='/login/')
 def rescue_submit(request):
     subm = submission()
@@ -96,15 +171,18 @@ def rescue_submit(request):
         # Ensure city is set
         if not subm.city:
             subm.city = 'Unknown'  # or raise an error
-
         print(subm.address)
         subm.condition = request.POST['condition']
         subm.description = request.POST['description']
-
         subm.save()
         image_path = subm.image.path
+        try:
+            push_noti(self=subm)
+        except Exception as e:
+            print(e)
 
-        return redirect('dashboard/')
+
+        return redirect('/dashboard/')
 
 
 @login_required(login_url='/login/')
@@ -139,3 +217,8 @@ def delete_report(request, report_id):
         report = get_object_or_404(submission, id=report_id)
         report.delete()
     return redirect('emergency_report_list')
+
+login_required(login_url='/login/')
+def reportdetails(request, report_id):
+    report = get_object_or_404(submission, id=report_id)
+    return render(request, 'reportdetails.html', {'report': report})

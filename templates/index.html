@@ -1,1169 +1,621 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Navbar</title>
-{#    <link rel="stylesheet" href="{%  static 'style/index.css'%}">#}
+    <title>PawsomeRescue</title>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-messaging-compat.js"></script>
     <style>
-                body {
+        * {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
-        /*===================================================================================*/
+        :root {
+            --primary: #FF7F50;
+            --secondary: #4ECDC4;
+            --dark: #2F4858;
+            --light: #F9F9F9;
+        }
 
-        .navbar {
+        body {
+            background-color: var(--light);
+            line-height: 1.6;
+        }
+
+        nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #fff;
-            padding: 10px 20px;
-            color: #080612;
+            padding: 1.5rem 5%;
+            background-color: rgba(255, 255, 255, 0.95);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .navbar .logo {
-            font-size: 1.5em;
-            font-weight: bold;
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -1px;
+            transition: transform 0.3s ease;
         }
 
-        .navbar ul {
-            list-style-type: none;
-            margin: 0px;
-            padding: 0px;
+        .nav-links {
             display: flex;
+            gap: 2.5rem;
         }
 
-        .navbar ul li {
-            /* margin: 10px; */
-            display: flex;
-            /* align-items: center; */
-        }
-
-        .navbar ul li a {
+        .nav-links a {
             text-decoration: none;
-            color:  #080612;
-            padding: 8px 12px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
+            color: var(--dark);
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
         }
 
-        .navbar ul li a:hover {
-            text-decoration: underline;
-            /* background-color: #575757; */
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
         }
 
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
+        .nav-links a:hover::after {
+            width: 100%;
         }
-
-        .hamburger div {
-            width: 25px;
-            height: 3px;
-            background-color: #080612;
-            margin: 4px 0;
-        }
-
-        @media (max-width: 768px) {
-
-            .navbar ul {
-                list-style-type: none;
-                margin: 0px;
-                padding: 10px;
-                display: flex;
-                border-radius: 20px;
-            }
-
-            .navbar ul {
-                display: none;
-                flex-direction: column;
-                background-color: #fff;
-                position: absolute;
-                top: 60px;
-                right: 6px;
-                width: auto;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-                z-index: 1;
-            }
-
-            .navbar ul li {
-                margin: 10px;
-                display: flex;
-                align-items: center;
-            }
-
-            .navbar ul.active {
-                display: flex;
-            }
-
-            .hamburger {
-                display: flex;
-            }
-        }
-
-        /*===================================================================================*/
 
         .hero {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)),
+                url('https://media.11alive.com/assets/CCT/images/a2f1c114-07da-4e86-9bca-2ca50ef5c72e/a2f1c114-07da-4e86-9bca-2ca50ef5c72e_1140x641.jpg') center/cover fixed;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            transform: translateZ(0);
+        }
+
+        .hero-content {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease forwards 0.3s;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        .section {
+            padding: 6rem 5%;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 3rem;
             position: relative;
-            background: url("{% static 'images/darkcat.jpg'%}") no-repeat;
-            background-size: cover;
-            background-position: center;
-            height: 500px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            text-align: center;
-            z-index: 0;
         }
 
-        .hero img {
-            width: auto;
-            height: 200px;
-            margin-bottom: 20px;
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
         }
 
-        .hero button {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .hero button:hover {
-            background-color: #575757;
-        }
-
-        /*===================================================================================*/
-
-        .quote {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-            /* font-size: xx-large; */
-            font-weight: bolder;
-            background-color: #ffffff;
-            color: #0B2153;
-            font-family: "Poppins", Sans-serif;
-            margin: 0;
-        }
-
-        .quote h1 {
-            margin: 0;
-        }
-
-        @media (max-width: 768px) {
-
-            .hero img {
-                width: auto;
-                height: 150px;
-                margin-bottom: 20px;
-            }
-
-        }
-
-        /*===================================================================================*/
-
-        .features {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            /* margin: 50px 0; */
-        }
-
-        .feature-box {
-            flex: 1 1 calc(33.333% - 40px);
-            background-color: #f4f4f4;
-            text-align: center;
-            color: #fff;
-            padding: 20px;
-            transition: transform 0.3s;
-            box-sizing: border-box;
-        }
-
-        .feature-box img {
-            width: 80%;
-            height: auto;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        .feature-box:nth-child(1) {
-            background-color: #ffdd77;
-        }
-
-        .feature-box:nth-child(2) {
-            background-color: #fcd14d;
-        }
-
-        .feature-box:nth-child(3) {
-            background-color: #fbc525;
-        }
-
-        .feature-box h3 {
-            /* margin-bottom: 10px; */
-            font-size: 2em;
-        }
-
-        .feature-box p {
-            font-size: 1.5em;
-            color: #555;
-        }
-
-        @media (max-width: 768px) {
-            .feature-box {
-                flex: 1 1 100%;
-            }
-
-            .feature-box:hover {
-                transform: translateY(0px);
-            }
-
-        }
-
-        /*===================================================================================*/
-
-
-        .quote1 {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 30px;
-            font-weight: bolder;
-            background-color: #ffffff;
-            background-image: url("{% static 'images/dog1.jpg'%}");
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            color: #ffffff;
-            font-family: "Poppins", Sans-serif;
-            margin: 0;
-            height: 300px;
-        }
-
-        .quote1 h1 {
-            margin: 0;
-            padding-bottom: 20px;
-            text-align: center;
-            font-size: 60px;
-        }
-
-        .quote1 h3 {
-            margin: 0;
-            text-align: center;
-            font-size: 30px;
-            font-weight: 100;
-        }
-
-        .donateB {
-            margin-left: 15px;
-            padding: 10px 60px;
-            color: #fff;
-            border: none;
-            border-radius: 20px;
-            background: #ffb727;
-            cursor: pointer;
-            font-size: 20px;
-            transition: 0.4s;
-        }
-
-        .donateB:hover {
-            color: #f0a500;
-            transition: 0.4s;
-            background: #fff;
-        }
-
-        @media(max-width: 768px) {
-            .quote1 h1 {
-                margin: 0;
-                padding-bottom: 10px;
-                text-align: center;
-                font-size: 40px;
-            }
-
-            .quote1 h3 {
-                margin: 0;
-                text-align: center;
-                font-size: 20px;
-                font-weight: 100;
-            }
-
-            .donateB {
-                margin-left: 15px;
-                padding: 10px;
-                color: #fff;
-                border: none;
-                border-radius: 20px;
-                background: #ffb727;
-                cursor: pointer;
-                font-size: 20px;
-                transition: 0.4s;
-            }
-
-            .donateB:hover {
-                color: #f0a500;
-                transition: 0.4s;
-                background: #fff;
-            }
-        }
-
-        .donate {
-            height: 500px;
-            background-color: aqua;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-        }
-
-
-        /*===================================================================================*/
-
-
-        .test {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            margin: 30px 0;
-            gap: 20px;
-        }
-
-        .cards {
-            background-color: #ffffff;
-            /* display: flex; */
-            /* flex-direction: column; */
+        .grid {
             display: grid;
-            grid-template-columns: repeat(2, 2fr);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
         }
 
         .card {
-            margin: 20px;
-            padding: 20px;
-            font-size: medium;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
             text-align: center;
-            border-radius: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            transition: box-shadow 0.3s ease-in-out;
-            background-color: #ffffff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
         }
 
-        .cards img {
-            height: 60px;
-            /* width: 60px; */
-            /* margin: 10px; */
-            padding: 10px;
-            border-right-color: gainsboro;
-            border: none;
-        }
-
-        .cards img a {
-            margin: 0;
-            padding: 0;
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .card:hover {
-            box-shadow: 0 2px 10px #ffb727;
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
         }
 
-        .cards::-webkit-scrollbar {
-            height: 10px;
-            width: 10px;
-        }
-
-        .cards::-webkit-scrollbar-thumb {
-            background-color: #ffb727;
-        }
-
-        .cards::-webkit-scrollbar-track {
-            background-color: #ececec;
-        }
-
-        .test h1 {
-            font-weight: bolder;
-            font-size: 2rem;
-            text-align: center;
-        }
-
-        @media(max-width: 768px) {
-            .cards {
-                background-color: #ffffff;
-                overflow: hidden;
-                /* display: flex; */
-                /* flex-direction: column; */
-                display: grid;
-                grid-template-columns: repeat(1, 1fr);
-            }
-        }
-
-
-        .moreB {
-            margin-left: 15px;
-            padding: 10px 60px;
-            color: #fff;
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary), #FF6347);
+            color: white;
+            padding: 1rem 2.5rem;
             border: none;
-            border-radius: 20px;
-            background: #ffb727;
+            border-radius: 30px;
             cursor: pointer;
-            font-size: 20px;
-            transition: 0.4s;
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 127, 80, 0.3);
         }
 
-        .moreB:hover {
-            color: #ffb727;
-            background: #fff;
-            transition: 0.8s;
-            box-shadow: inset 0 -2px 6px #1c469e;
-            /* Inside shadow at the bottom */
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 127, 80, 0.4);
         }
 
-        /*===================================================================================*/
-
-        .info {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-content: center;
-        }
-
-        /*===================================================================================*/
-
-
-        .features1 {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            margin: 30px 0;
-            gap: 20px;
-        }
-
-        .feature-box1 {
-            flex: 1 1 calc(33.333% - 40px);
-            background-color: #f4f4f4;
+        .mission-section {
+            background: white;
+            padding: 4rem 5%;
             text-align: center;
-            padding: 20px;
-            transition: transform 0.3s;
-            box-sizing: border-box;
         }
 
-        .feature-box1 img {
-            width: 20%;
-            height: auto;
-            border-radius: 8px;
-            margin-bottom: 15px;
+        .mission-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 2rem auto;
         }
 
-        .feature-box1:nth-child(1) {
-            background-color: #ffdddd;
+        .mission-card {
+            background: var(--light);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .feature-box1:nth-child(2) {
-            background-color: #ddffdd;
-        }
-
-        .feature-box1:nth-child(3) {
-            background-color: #ddddff;
-        }
-
-        .feature-box1:nth-child(4) {
-            background-color: #c4fbc1;
-        }
-
-        .feature-box1 h3 {
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-
-        .feature-box1 p {
-            font-size: 1em;
-            color: #555;
-        }
-
-        @media (max-width: 768px) {
-            .feature1-box {
-                flex: 1 1 100%;
-            }
-        }
-
-        /*===================================================================================*/
-
-        .FAQs {
-            margin: 20px;
-        }
-
-        .faq-heading {
+        .partners {
             text-align: center;
-            font-size: 24px;
-            margin-bottom: 20px;
+            padding: 2rem 0;
+            background: var(--dark);
+            color: white;
         }
 
-        .faq-list {
-            list-style-type: none;
-            padding-left: 0;
-            width: 60%;
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 5%;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
             margin: 0 auto;
         }
 
-        .faq-list li {
-            margin-bottom: 15px;
+        .mission-statement {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            opacity: 0.9;
         }
 
-        .faq-list strong {
-            font-weight: bold;
+        .image-credits {
+            margin: 2rem 0;
+            padding: 1.5rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .faq-answer {
-            color: #777; /* Light color for answers */
-        }
-
-
-        /*===================================================================================*/
-
-        .about-us {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-
-        .about-us .card {
-            background: #fff;
-            border: 1px solid #ddd;
-            {#hight:500px;#}
-            border-radius: 8px;
-            overflow: hidden;
-            text-align: center;
-            padding: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .about-us .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .about-us .card img {
-
-            width: auto;
-            height: 300px;
-            crop: auto;
-            border-radius: 8px;
-        }
-
-        .about-us .card h2 {
-            margin: 15px 0 10px;
-            font-size: 1.5rem;
-            color: #333;
-        }
-
-        .about-us .card p {
-            color: #666;
-            font-size: 1rem;
-            margin: 0;
-        }
-
-        .about-us .info {
-            text-align: center;
-        }
-
-        .card .info {
+        .image-credits p {
+            margin: 0.5rem 0;
             font-size: 0.9rem;
-            color: #444;
-            margin: 10px 0;
-            line-height: 1.5;
+            opacity: 0.8;
         }
 
-        .card button:hover {
-            background-color: #ffb727;
-        }
-
-        .about-info {
-            /* display: flex; */
-            /* justify-content: center; */
-            text-align: center;
-            padding: 25px;
-            background-color: #f9f9f9;
-        }
-
-        .about-info p {
-            font-size: 1rem;
-            color: #444;
-        }
-
-        .about-info button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #ffb727;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.3s ease;
-        }
-
-        @media (max-width: 480px) {
-
-            .about-us .card h2 {
-                font-size: 1.2rem;
-            }
-
-            .about-us .card p {
-                font-size: 0.9rem;
-            }
-
-            .about-info p {
-                font-size: 0.9rem;
-            }
-
-            .card button {
-                font-size: 0.9rem;
-            }
-        }
-
-        /*===================================================================================*/
-
-
-
-
-
-
-
-
-
-
-        /*===================================================================================*/
-
-
-
-
-        .sub {
-            margin-left: 15px;
-            padding: 10px 60px;
-            color: #fff;
-            border: none;
-            border-radius: 20px;
-            background: #ffb727;
-            cursor: pointer;
-            font-size: 20px;
-            transition: 0.4s;
-        }
-
-        .sub:hover {
-            color: #f0a500;
-            transition: 0.4s;
-            background: #fff;
-        }
-
-        /*===================================================================================*/
-        /*Footer*/
-        footer {
-            background-color: #d8e2e0;
-            color: black;
-            text-align: center;
-            padding: 20px 60px;
-            position: relative;
-            bottom: 0;
-            /* width: 100%; */
-        }
-
-        footer a {
-            color: #fff;
-            text-decoration: none;
-            margin: 0 10px;
-            transition: color 0.3s;
-        }
-
-        footer a:hover {
-            color: #ccc;
-        }
-
-        .contectBar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-
-        .CinstagramLogo,
-        .ClinkedinLogo,
-        .CfacebookLogo,
-        .CgmailLogo {
-            /* filter: invert(1); */
+        .legal-links {
+            margin: 1.5rem 0;
             display: flex;
             justify-content: center;
-            height: 25px;
-            width: 25px;
-            margin-right: 3%;
-            margin-left: 2%;
+            gap: 1.5rem;
+            flex-wrap: wrap;
         }
 
-        a {
+        .legal-links a {
+            color: var(--primary);
             text-decoration: none;
+            transition: opacity 0.3s ease;
         }
 
-        user agent stylesheet a:-webkit-any-link {
-            color: -webkit-link;
+        .legal-links a:hover {
+            opacity: 0.8;
+        }
+
+        .legal-links span {
+            opacity: 0.5;
+        }
+
+        .copyright {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Styles */
+        .menu-toggle {
+            display: none;
             cursor: pointer;
-            text-decoration: underline;
+            font-size: 1.5rem;
+            color: var(--dark);
         }
 
-        .arrow-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .arrow-list li {
-            margin: 0.5em 0;
-            font-size: 16px;
-        }
-
-        .arrow-list li::before {
-            /* content: "➤ "; */
-            color: #333;
-            font-weight: bold;
-            margin-right: 0.5em;
-        }
-
-        footer .links a{
-            color: #007BFF;
-            text-decoration: underline;
-            /* font-style: oblique; */
-        }
-
-
-
-
-        @media (max-width: 768px) {
-            footer {
-                padding: 15px 10px;
-                width: auto;
-            }
-
-            footer a {
-                margin: 5px 0;
+        @media screen and (max-width: 1024px) {
+            .nav-links {
+                gap: 1.5rem;
             }
         }
 
-        /*===================================================================================*/
+        @media screen and (max-width: 768px) {
+            nav {
+                padding: 1rem 5%;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                padding: 1rem;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+            .mission-columns {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .grid {
+                gap: 1.5rem;
+            }
+
+            .section {
+                padding: 4rem 5%;
+            }
+
+            .mission-card {
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
 
 <body>
-{% csrf_token %}
-    <nav class="navbar">
-        <div class="logo">Animal Report Portal</div>
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Contact</a></li>
+  {% csrf_token %}{
+    <nav>
+        <div class="logo">PawsomeRescue</div>
+        <div class="menu-toggle">☰</div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#mission">Mission</a>
+            <a href="#work">How It Works</a>
+            <a href="#aboutus">About Us</a>
             {% if user.is_authenticated %}
-                <a type="button"  href="user/logout" class="sub" id="logout">LogOut</a>
+                <a type="button"  href="/dashboard/" id="dasboard">Dashboard</a>
+                <a type="button"  href="user/logout" id="logout">LogOut</a>
             {% else %}
-                <a type="button"  href="user/signup" class="sub" id="signup">SignUp</a>
-                <a type="button"  href="user/login" class="sub" id="signup">LogIn</a>
+                <a type="button"  href="user/signup" id="signup">SignUp</a>
+                <a type="button"  href="user/login" id="signup">LogIn</a>
             {% endif %}
-
-        </ul>
-        <div class="hamburger" onclick="toggleMenu()">
-            <div></div>
-            <div></div>
-            <div></div>
         </div>
     </nav>
 
-    <section class="hero">
-        <img src="{% static 'images/voice.png'%}" alt="Centered Image">
-        {% if user.is_authenticated %}
-        <h1>Welcome! {{ user.first_name }} {{ user.last_name }}</h1>
-{#        {% else %}#}
-{#        <a type="button" href="user/signup" class="sub" id="signup">SignUp</a>#}
-{#        <a type="button" href="user/login" class="sub" id="signup">login</a>#}
-        {% endif %}
-        <a type="button" href="form" class="sub" id="signup">Submit a report</a>
-
-    </section>
-
-    <div class="quote">
-        <h1>Help Your Self by Helping them</h1>
-    </div>
-
-    <section class="features">
-        <div class="feature-box">
-            <!-- <img src="feature1.jpg" alt="Feature 1"> -->
-            <h3>Report</h3>
-            <!-- <p>Details about Feature 1. This is a short description.</p> -->
-        </div>
-        <div class="feature-box">
-            <!-- <img src="feature2.jpg" alt="Feature 2"> -->
-            <h3>Engage</h3>
-            <!-- <p>Details about Feature 2. This is a short description.</p> -->
-        </div>
-        <div class="feature-box">
-            <!-- <img src="feature3.jpg" alt="Feature 3"> -->
-            <h3>Save</h3>
-            <!-- <p>Details about Feature 3. This is a short description.</p> -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Hurt. Alone. Terrified.<br>Your Report Is Their Lifeline.</h1>
+            <p>
+              That whimper you heard? The blood on the sidewalk?<br>
+                Silent. Suffering. Dying Unseen<br>
+              <strong>Post here now</strong>—before their time runs out.
+            </p>
+            <button onclick="window.location.href='/form/'"  class="cta-button">Submit Report</button>
         </div>
     </section>
 
-    <div class="quote1">
-        <h3>Support the Cause!</h3>
-        <h1>Be that Change<br>for Greater good</h1>
-        <input type="submit" value="Donate" src="signup.html" class="donateB" id="signup">
-    </div>
-
-    <section class="test">
-        <h1>Organizations in Pakistan <br>dedicated to Animal Welfare</h1>
-
-        <div class="cards">
-            <div class="card">
-                <a href="">
-                    <img class="card-img" src="https://ngobase.org/images/ngo_logos/PK/Adopt%20a%20Pet_ngo.jpg"
-                        alt="Adopt a Pet">
-                </a>
-                <h4>Adopt a Pet</h4>
-                <p>A Karachi-based NGO focused on finding homes for rescued and abandoned animals, particularly cats.
+    <section class="mission-section" id="mission">
+        <h2>Our Mission</h2>
+        <div class="mission-columns">
+            <div class="mission-card">
+                <h3>Help the Voiceless</h3>
+                <p>Educating the community about responsible animal care and advocating for animal welfare and rights.
                 </p>
             </div>
-            <div class="card">
-                <a href="">
-                    <img class="card-img"
-                        src="https://ngobase.org/images/ngo_logos/PK/Awaz-e-Bezuban-Welfare-Association-ngo.jpg"
-                        alt="Awaz-e-Bezuban">
-                </a>
-                <h4>Awaz-e-Bezuban</h4>
-                <p>Pakistan's first student-based animal welfare NGO providing TNVR services for strays and advocating
-                    for animal rights.</p>
-            </div>
-            <div class="card">
-                <a href="">
-                    <img class="card-img"
-                        src="https://ngobase.org/images/ngo_logos/PK/Animal-Rescue-&-Transportation-Service-Karachi---ARTS-ngo.jpg"
-                        alt="ARTS">
-                </a>
-                <h4>Animal Rescue & Transportation Service Karachi - ARTS</h4>
-                <p>A.R.T.S. offers the rescue and transportation of sick and injured animals. ARTS is working as an
-                    animal protection society. This is one of the largest cat rescue and animal care centers in
-                    Pakistan.</p>
-            </div>
-            <div class="card">
-                <a href="https://example.com/java-info">
-                    <img class="card-img"
-                        src="https://ngobase.org/images/ngo_logos/PK/Pakistan-Fisherfolk-Forum-(PFF)-ngo.jpg"
-                        alt="Pakistan Fisherfolk Forum (PFF)">
-                </a>
-                <h4>Pakistan Fisherfolk Forum (PFF)</h4>
-                <p>PFF is an NGO in Karachi. It is working for progression of underprivileged communities in Pakistan.
-                    They are working on food security, water rights, emergency response, environment and climate change
-                    in Pakistan. It was established in 1998.</p>
-            </div>
-            <div class="card">
-                <a href="https://example.com/java-info">
-                    <img class="card-img" src="	https://ngobase.org/images/ngo_logos/PK/Karachi-Animal-Welfare-Society---KAWS-ngo.jpg
-                        " alt="Java">
-                </a>
-                <h4>Karachi Animal Welfare Society - KAWS</h4>
-                <p>KAWS is an animal rescue and welfare service in Karachi. It is a non-profit organization that also
-                    provides free treatment for injured animals and tries to arrange homes for them.</p>
-            </div>
-            <div class="card">
-                <a href="https://example.com/java-info">
-                    <img class="card-img"
-                        src="https://upload.wikimedia.org/wikipedia/commons/7/77/Pakistan_Animal_Welfare_Society_logo.gif"
-                        alt="Java">
-                </a>
-                <h4>Pakistan Animal Welfare Society (PAWS)</h4>
-                <p>Founded in 2004, PAWS is a volunteer-run organization based in Karachi that focuses on rescuing and
-                    treating animals, as well as raising awareness and advocating for animal rights.</p>
+            <div class="mission-card">
+                <h3>Be the Cause</h3>
+                <p>Together, we can make a difference in the lives of countless animals and create a world where every
+                    animal is loved and cherished.</p>
             </div>
         </div>
-        <input class="moreB" type="button" value="More" onclick="openWin(1)">
-
-
     </section>
 
-
-    <div class="info">
-        <h1>How ARP Works</h1>
-    </div>
-    <section class="features1">
-        <div class="feature-box1">
-            <img src="{% static 'images/pin.png'%}" alt="Feature 1">
-            <h3>Step 1: Find Help Nearby:</h3>
-            <p> Our app helps you find the nearest veterinary hospitals, NGOs, or rescue organizations
-                on the map. Simply enter your location, and we'll show you the closest available help.</p>
+    <section class="section" id="work">
+        <h2>How It Works</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Step 1: Find Help Nearby</h3>
+                <p>Our app helps you find the nearest veterinary hospitals, NGOs, or rescue organizations on the map.
+                </p>
+                <button class="cta-button">Browse Services</button>
+            </div>
+            <div class="card">
+                <h3>Step 2: Submit Report</h3>
+                <p>Fill out a simple form with essential details and photos to help responders understand the situation.
+                </p>
+                <button class="cta-button" onclick="window.location.href='/form/'">Submit Report</button>
+            </div>
+            <div class="card">
+                <h3>Step 3: Get Assistance</h3>
+                <p>Nearest organizations receive alerts while community members can offer transportation or support.</p>
+                <button class="cta-button">Get Help</button>
+            </div>
         </div>
-        <div class="feature-box1">
-            <img src="{% static 'images/penNpaper.png'%}" alt="Feature 2">
-            <h3>Step 2: Fill the Report Form:</h3>
-            <p> After locating nearby help, fill out a simple form with essential details about
-                the situation, including a photo of the injured animal. This helps responders understand the urgency and
-                condition of the animal.</p>
-        </div>
-        <div class="feature-box1">
-            <img src="{% static 'images/action.png'%}" alt="Feature 3">
-            <h3>Step 3: Immediate Action and Community Support:</h3>
-            <p> Once your report is submitted, it is uploaded to our database,
-                and a notification is sent to the nearest vet hospital, NGO, or rescue organization. The report is also
-                displayed on the map for other users who may want to assist, offering transportation, financial aid, or
-                other forms of help.</p>
-        </div>
-
-
-
-
     </section>
 
-
-    <section class="FAQs">
-            <h2 class="faq-heading">Frequently Asked Questions (FAQs)</h2>
-            <ul class="faq-list">
-            <li><strong>1. What is the purpose of the Animal Report Portal?</strong><br>
-                The portal aims to connect individuals witnessing animal injuries or pollution issues with rescue
-                organizations and volunteers for swift assistance.
-            </li>
-            <li><strong>2. How does the platform locate nearby help?</strong><br>
-                The platform uses the user's location to identify nearby veterinary hospitals, NGOs, or rescue
-                organizations on a map.
-            </li>
-            <li><strong>3. What details do I need to submit a report?</strong><br>
-                You need to provide basic information about the incident, a photo, and the animal's condition.
-            </li>
-            <li><strong>4. Who can respond to the reports submitted?</strong><br>
-                Reports can be addressed by local rescue organizations, veterinary hospitals, and volunteers.
-            </li>
-            <li><strong>5. Can I track the status of my report?</strong><br>
-                Yes, users can view the status of their reports and see if they have been resolved or are in progress.
-            </li>
-            <li><strong>6. Is there a cost to use the platform?</strong><br>
-                No, the platform is free for users to report incidents and access resources.
-            </li>
-            <li><strong>7. How can I help if I’m not a rescue organization?</strong><br>
-                You can assist by providing transportation, financial aid, or other support to resolve reported issues.
-            </li>
-            <li><strong>8. Does the platform work internationally?</strong><br>
-                Currently, the platform is focused on specific regions, but we plan to expand in the future.
-            </li>
-            <li><strong>9. How do you ensure the reports are legitimate?</strong><br>
-                Each report is verified by requiring detailed information and cross-checking with responders.
-            </li>
-            <li><strong>10. What happens to resolved reports?</strong><br>
-                Resolved reports are marked as such and removed from the active database to avoid duplication.
-            </li>
-            <li><strong>11. Can I volunteer to help animals?</strong><br>
-                Yes, the platform allows individuals to sign up as volunteers and assist with cases in their area.
-            </li>
-            <li><strong>12. What should I do if I encounter a dangerous animal?</strong><br>
-                In such cases, report the incident immediately and wait for professional responders to handle it.
-            </li>
-            <li><strong>13. How is my location data used?</strong><br>
-                Location data is used solely to identify nearby resources and is not shared or stored permanently.
-            </li>
-            <li><strong>14. Can organizations collaborate with the portal?</strong><br>
-                Yes, NGOs and veterinary hospitals can register to collaborate and receive incident notifications.
-            </li>
-            <li><strong>15. What should I do if no help is nearby?</strong><br>
-                The platform encourages users to seek alternative resources or provide interim assistance while awaiting
-                responders.
-            </li>
-            <li><strong>16. Does the platform support reporting pollution issues?</strong><br>
-                Yes, users can report pollution alongside animal injuries, raising awareness for broader environmental
-                concerns.
-            </li>
-            <li><strong>17. Can I upload multiple photos in a single report?</strong><br>
-                Currently, the platform supports one photo per report to ensure clarity and focus.
-            </li>
-            <li><strong>18. How can I donate to support the project?</strong><br>
-                Donations can be made via the platform to assist with operational costs and animal welfare initiatives.
-            </li>
-            <li><strong>19. Are there any rewards for contributing to reports?</strong><br>
-                While there are no material rewards, contributors gain recognition for their efforts in creating a
-                better community.
-            </li>
-            <li><strong>20. How can I contact the development team?</strong><br>
-                You can contact the team through the provided social media links or the "Contact Us" section of the
-                platform.
-            </li>
-        </ul>
+    <section class="section" id="aboutus">
+        <h2>About Us</h2>
+        <div class="card">
+            <p>Our app helps you find the nearest veterinary hospitals, NGOs, or rescue organizations on the map. </p>
+            <p>We are a passionate team dedicated to the welfare of animals and the environment. Our mission is to
+                bridge
+                the gap between those who witness animals in distress and those who can provide immediate help. With our
+                innovative web platform, we empower individuals to take action, connect with local rescue organizations,
+                and
+                create a compassionate community for animals in need. Our project provides a seamless way to report
+                animal
+                injuries or pollution issues by allowing users to share details and locations through an intuitive
+                interface. By collaborating with veterinary hospitals, NGOs, and volunteers, we aim to ensure timely
+                intervention and care for animals. At the heart of our initiative is the belief that every life matters.
+                Together, we can create a world where kindness and compassion extend to all living beings.</p>
+            <button onclick="window.location.href='/aboutus/'" class="cta-button">Learn more </button>
+        </div>
     </section>
 
-
-    <section class="about-us">
-        <div class="card">
-            <img src="{% static 'images/aziz_photon.jpg'%}" alt="Team Member 1">
-            <h2>Aziz</h2>
-            <p>Frontend Developer. Specialist in React and creating responsive designs.</p>
-        </div>
-        <div class="card">
-            <img src="{% static 'images/pp1.png'%}" alt="Team Member 2">
-            <h2>Mueed</h2>
-            <p>Backend Developer. Expert in Django Rest Framework and database management.</p>
-        </div>
-        <div class="card">
-            <img src="{% static 'images/pp1.png'%}" alt="Team Member 3">
-            <h2>Zain</h2>
-            <p>UI/UX Designer. Passionate about creating user-centered designs.</p>
-        </div>
-        <div class="card">
-            <img src="{% static 'images/pp1.png'%}" alt="Team Member 4">
-            <h2>Ali</h2>
-            <p>Full Stack Developer. Experienced in both front-end and back-end technologies.</p>
-        </div>
-
-    </section>
-    <div class="about-info">
-        <p>We are a passionate team dedicated to the welfare of animals and the environment. Our mission is to bridge
-            the gap between those who witness animals in distress and those who can provide immediate help. With our
-            innovative web platform, we empower individuals to take action, connect with local rescue organizations, and
-            create a compassionate community for animals in need.
-
-            Our project provides a seamless way to report animal injuries or pollution issues by allowing users to share
-            details and locations through an intuitive interface. By collaborating with veterinary hospitals, NGOs, and
-            volunteers, we aim to ensure timely intervention and care for animals.
-
-            At the heart of our initiative is the belief that every life matters. Together, we can create a world where
-            kindness and compassion extend to all living beings.</p>
-        <button>Learn More</button>
-    </div>
 
     <footer>
+        <div class="footer-content">
+            <p class="mission-statement">We are committed to creating a community that cares for animals and the
+                environment. Our platform connects individuals, rescue organizations, and volunteers to provide swift
+                assistance to animals in need. Join us in building a compassionate and responsible world for all living
+                beings.</p>
 
-        <div class="contectBar">
-            <a class="CinstagramLogo" href="https://www.instagram.com/mir_ali_mardan_talpur/">
-                <img src="https://cdn-icons-png.flaticon.com/512/3670/3670274.png" alt="Instagram Logo">
-            </a>
-            <a class="ClinkedinLogo" href="https://www.linkedin.com/in/ali-mardan-talpur-23244025b/">
-                <img src="https://cdn-icons-png.flaticon.com/512/1384/1384014.png" alt="LinkedIn Logo">
-            </a>
-            <a class="CfacebookLogo" href="https://web.facebook.com/alimardan.talpur.9">
-                <img src="https://cdn3.iconfinder.com/data/icons/picons-social/57/46-facebook-512.png"
-                    alt="Facebook Logo">
-            </a>
-            <form id="webpush-subscribe-form">
-                <button type="button" onclick="requestNotificationPermission()" style="display: inline-block;
-                    padding: 10px 20px;
-                    background-color: #ffb727;
-                    color: #fff;
-                    border: none;
-                    border-radius: 5px;
-                    font-size: 1rem;
-                    cursor: pointer;
-                    margin-top: 10px;
-                    transition: background-color 0.3s ease;
-                }">Enable Notifications</button>
-            </form>
-        </div>
-        <div class="footerDescriptionBox">
-            <div class="footerDescription">
-                <p>We are committed to creating a community that cares for animals and the environment. Our platform
-                    connects individuals, rescue organizations, and volunteers to provide swift assistance to animals in
-                    need. Join us in building a compassionate and responsible world for all living beings.</p>
+            <div class="image-credits">
+                <p>• All images used in this project are credited to their respective owners.</p>
+                <p>• No copyright infringement intended. Images are used for informational, illustrative and education
+                    purposes only.</p>
+            </div>
+            {% if user.is_authenticated and user.fcm%}
+                 <form id="webpush-subscribe-form">
+                    <button type="button" onclick="requestNotificationPermission(event)" style="display: inline-block;
+                        padding: 10px 20px;
+                        background-color: #ffb727;
+                        color: #fff;
+                        border: none;
+                        border-radius: 5px;
+                        font-size: 1rem;
+                        cursor: pointer;
+                        margin-top: 10px;
+                        transition: background-color 0.3s ease;
+                    }">Enable Notifications</button>
+                </form>
+            {% else %}
+                <p>You are not logged in.</p>
+            {% endif %}
+
+            <div class="legal-links">
+                <a href="/privacy">Privacy Policy</a>
+                <span>|</span>
+                <a href="/terms">Terms of Service</a>
+                <span>|</span>
+                <a href="/contact">Contact</a>
+            </div>
+
+            <div class="copyright">
+                <p>© 2024 PawsomeRescue. All Rights Reserved.</p>
             </div>
         </div>
-
-        <div class="credits">
-            <ul class="arrow-list">
-                <li>➤ All images used in this project are credited to their respective owners.</li>
-                <li>➤ No copyright infringement intended. Images are used for informational, illustrative and education
-                    purposes only.</li>
-            </ul>
-        </div>
-        <p class="links">
-            <a href="#">Privacy Policy</a> |
-            <a href="#">Terms of Service</a> |
-            <a href="#">Contact</a>
-        </p>
-        <p>&copy; 2024 MySite. All Rights Reserved.</p>
-
-
     </footer>
+     <script>
+        // Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyA80SmOpP14bbtiVj2OA363_Cp8Hm0_W50",
+          authDomain: "animal-rescue-portal.firebaseapp.com",
+          projectId: "animal-rescue-portal",
+          storageBucket: "animal-rescue-portal.firebasestorage.app",
+          messagingSenderId: "833958160499",
+          appId: "1:833958160499:web:3e651a4a2bbf1f76692206",
+          measurementId: "G-4DDP7997KY"
+        };
 
-</body>
-<script>
-// Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyA80SmOpP14bbtiVj2OA363_Cp8Hm0_W50",
-  authDomain: "animal-rescue-portal.firebaseapp.com",
-  projectId: "animal-rescue-portal",
-  storageBucket: "animal-rescue-portal.firebasestorage.app",
-  messagingSenderId: "833958160499",
-  appId: "1:833958160499:web:3e651a4a2bbf1f76692206",
-  measurementId: "G-4DDP7997KY"
-};
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
 
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const messaging = firebase.messaging(app);
-
-function requestNotificationPermission(event) {
-  if (event) event.preventDefault(); // Prevent any default behavior
-
-  Notification.requestPermission().then((permission) => {
-    if (permission === 'granted') {
-      messaging.getToken({ vapidKey: 'BNmjhTKr3tR05Ct4P3EGqdxown9waj1HOPOTm2DrpTuSHc7Vi2m9bRamZ7hXZfE92gtQFmto8BIqcfj1hEWRmFo' })
-        .then((currentToken) => {
-          if (currentToken) {
-            fetch('/save-fcm-token/', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-              },
-              body: JSON.stringify({ token: currentToken })
-            }).then(response => {
-              if (!response.ok) throw new Error('Failed to save token');
-              console.log('Token saved successfully');
-            }).catch(error => {
-              console.error('Error saving token:', error);
-            });
-          }
+        if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/static/firebase-messaging-sw.js')
+        .then(registration => {
+          console.log('Service Worker registered:', registration);
         })
-        .catch((error) => {
-          console.error('Error getting token:', error);
+        .catch(error => {
+          console.error('Service Worker registration failed:', error);
         });
     }
-  });
-}
-</script>
+
+        function requestNotificationPermission(event) {
+          event.preventDefault();
+          Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+              messaging.getToken({ vapidKey: 'BNmjhTKr3tR05Ct4P3EGqdxown9waj1HOPOTm2DrpTuSHc7Vi2m9bRamZ7hXZfE92gtQFmto8BIqcfj1hEWRmFo' })
+                .then((currentToken) => {
+                  if (currentToken) {
+                    console.log('FCM Token:', currentToken);
+                    fetch('/save-fcm-token/', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                      },
+                      body: JSON.stringify({ token: currentToken })
+                    });
+                  }
+                })
+                .catch(console.error);
+            }
+          });
+        }
+      </script>
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Close menu on click outside
+        document.addEventListener('click', (e) => {
+            if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+
+        // Intersection Observer for animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    if (entry.target.classList.contains('card')) {
+                        entry.target.style.transitionDelay = `${entry.target.dataset.delay || 0}ms`;
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+
+        // Observe elements
+        document.querySelectorAll('.section, .mission-card').forEach(el => observer.observe(el));
+        document.querySelectorAll('.card').forEach((card, index) => {
+            card.dataset.delay = index * 100;
+            observer.observe(card);
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                window.scrollTo({
+                    top: target.offsetTop - 90,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            nav.style.padding = window.scrollY > 50 ? '1rem 5%' : '1.5rem 5%';
+            nav.style.boxShadow = window.scrollY > 50 ? '0 4px 15px rgba(0,0,0,0.1)' : 'none';
+        });
+    </script>
+</body>
+
 </html>
-
-<!-- <input type="submit" value="SignUp" src="signup.html" class="sub" id="signup"> -->
-
-<!-- 
-
-
-.sub {
-    margin-left: 15px;
-    padding: 10px 80px;
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    background: #ffb727;
-    cursor: pointer;
-    font-size: 20px;
-    transition: 0.4s;
-}
-
-.sub:hover {
-    color: #f0a500;
-    transition: 0.4s;
-    background: #fff;
-}
-
--->

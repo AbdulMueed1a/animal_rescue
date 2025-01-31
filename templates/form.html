@@ -8,7 +8,8 @@
     <title>Report Animal Condition</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
+    <!-- Add these scripts before your custom JavaScript -->
+
 <script>
      window.onload = function() {
             // Get today's date in YYYY-MM-DD format
@@ -21,6 +22,7 @@
             // Set the value of the input to today's date
             dateInput.value = today;
         };
+
 
 
 </script>
@@ -112,7 +114,7 @@
 
 <body>
     <div class="form-container">
-        <form id="reportForm" action="rescue_submit" method="POST" enctype="multipart/form-data">
+        <form id="reportForm" action="/rescue_submit/" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <h2>Report Animal Condition</h2>
             <div class="form-group">
@@ -241,15 +243,15 @@
             </div>
         </form>
     </div>
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js";
+import {
+  getMessaging,
+  onMessage,
+  getToken,
+  onTokenChanged  // <-- THIS IS THE CORRECT IMPORT
+} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
     apiKey: "AIzaSyA80SmOpP14bbtiVj2OA363_Cp8Hm0_W50",
     authDomain: "animal-rescue-portal.firebaseapp.com",
@@ -261,8 +263,35 @@
   };
 
   // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+// Get current service worker registration
+navigator.serviceWorker.register('/firebase-messaging-sw.js')
+  .then(async (registration) => {
+    // Get initial token
+    const token = await getToken(messaging, {
+      vapidKey: "BNmjhTKr3tR05Ct4P3EGqdxown9waj1HOPOTm2DrpTuSHc7Vi2m9bRamZ7hXZfE92gtQFmto8BIqcfj1hEWRmFo",
+      serviceWorkerRegistration: registration
+    });
+    console.log('Initial Token:', token);
+
+    // Listen for token changes
+    onTokenChanged(messaging, (newToken) => {  // <-- CORRECT USAGE
+      if (newToken) {
+        console.log('New Token:', newToken);
+        // Update backend here
+      }
+    });
+  });
+
+// Handle foreground messages
+onMessage(messaging, (payload) => {
+  console.log('Message received:', payload);
+  new Notification(payload.notification.title, {
+    body: payload.notification.body
+  });
+});
 </script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {

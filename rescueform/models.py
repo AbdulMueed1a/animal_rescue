@@ -2,6 +2,7 @@ from _datetime import date
 from django.contrib.auth.models import User
 from django.db import models
 
+
 # Create your models here.
 class submission(models.Model):
     STATUS_CHOICES = [
@@ -29,6 +30,7 @@ class submission(models.Model):
     description = models.TextField()
     condition = models.CharField(max_length=100)
     status = models.CharField(max_length=100,choices=STATUS_CHOICES,default="received")
+
 
 
 

@@ -58,7 +58,7 @@
             padding: 1rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             height: 50%;
-            flex: 1;
+            /*flex: 1;*/
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -85,6 +85,14 @@
             grid-template-columns: 100px 1fr;
             gap: 1.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
         }
 
         .user-report-card {
@@ -159,8 +167,9 @@
 
         @media (max-width: 768px) {
 
-            .map-section {
-                height: 50vh;
+            #map-mobile {
+                height: 50vh !important;
+                min-height: 300px;
             }
 
             #map {
@@ -222,262 +231,156 @@
 
 <body>
     <div class="container">
-        <!-- Desktop Sections -->
-        <div class="left-section">
-            <h2 style="color: var(--user-accent); margin-bottom: 1.5rem;">📋 Your Reports</h2>
-            {% for subm in usersubm %}
-            <div class="report-card user-report-card">
-                <img src="{{ subm.image.url }}" class="card-image" loading="lazy">
-                <div class="card-details">
-                    <span class="status-badge">{{ subm.condition }}</span>
+    <!-- Desktop Sections -->
+    <div class="left-section">
+        <h2 style="color: var(--user-accent); margin-bottom: 1.5rem;">📋 Your Reports</h2>
+        {% for subm in usersubm %}
+        <div class="report-card user-report-card" onclick="window.location.href='./{{ subm.id }}'">
+            <img src="{{ subm.image.url }}" class="card-image" loading="lazy">
+            <div class="card-details">
+                <span class="status-badge">{{ subm.condition }}</span>
 
-                    <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                        </svg>
-                        {{ subm.date }}
-                    </div>
-                    <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                        </svg>
-                        {{ subm.city }}
-                    </div>
-                    <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                        </svg>
-                        {{ subm.email }}
-                    </div>
-                    <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                        </svg>
-                        {{ subm.address }}
-                    </div>
-                    <!-- Add other user report details here -->
+                <div class="detail-row">
+                    📅 {{ subm.date }}
+                </div>
+                <div class="detail-row">
+                    📍 {{ subm.city }}
+                </div>
+                <div class="detail-row">
+                    ✉️ {{ subm.email }}
+                </div>
+                <div class="detail-row">
+                    🏠 {{ subm.address }}
                 </div>
             </div>
-            {% endfor %}
         </div>
+        {% endfor %}
+    </div>
 
-        <div class="right-column">
-            <div class="map-section">
-                <h2 style="color: var(--primary); margin-bottom: 1rem;">🗺️ Incident Map</h2>
-                <div id="map"></div>
-            </div>
-            <div class="global-reports">
-                <h2 style="color: var(--global-accent); margin-bottom: 1.5rem;">🌍 Global Reports</h2>
-                {% for report in storedReports %}
-                <div class="report-card global-report-card">
-                    <img src="{{ report.image.url }}" class="card-image" loading="lazy">
-                    <div class="card-details">
-                        <span class="status-badge">{{ report.condition }}</span>
-
-                        <div class="detail-row">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                            </svg>
-                            {{ report.city }}
-                        </div>
-                        <div class="detail-row">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                            </svg>
-                            {{ report.address }}
-                        </div>
-                        <div class="detail-row">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {{ report.date }}
-                        </div>
-                        <div class="detail-row">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Verified: {{ report.verified|yesno:"Yes,No" }}
-                        </div>
-
-                        <!-- Add other global report details here -->
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Mobile Sections -->
-        <div class="map-section mobile-section active">
+    <div class="right-column">
+        <div class="map-section">
             <h2 style="color: var(--primary); margin-bottom: 1rem;">🗺️ Incident Map</h2>
-            <div id="map-mobile"></div>
+            <div id="map"></div>
         </div>
-
-        <select class="mobile-selector" id="mobileSelect">
-            <option value="user">User Reports</option>
-            <option value="global">Global Reports</option>
-        </select>
-
-        <div class="left-section mobile-section" id="mobileUser">
-            <h2 style="color: var(--user-accent); margin-bottom: 1.5rem;">📋 Your Reports</h2>
-            {% for subm in usersubm %}
-            <div class="report-card user-report-card">
-                <img src="{{ subm.image.url }}" class="card-image" loading="lazy">
-                <div class="card-details">
-                    <span class="status-badge">{{ subm.condition }}</span>
-
-
-                    <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                        </svg>
-                        {{ subm.date }}
-                    </div>
-                    <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                        </svg>
-                        {{ subm.city }}
-                    </div>
-                    <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                        </svg>
-                        {{ subm.email }}
-                    </div>
-                    <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                        </svg>
-                        {{ subm.address }}
-                    </div>
-
-
-                    <!-- Add other user report details here -->
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div class="global-reports mobile-section" id="mobileGlobal">
+        <div class="global-reports">
             <h2 style="color: var(--global-accent); margin-bottom: 1.5rem;">🌍 Global Reports</h2>
             {% for report in storedReports %}
-            <div class="report-card global-report-card">
+            <div class="report-card global-report-card" onclick="window.location.href='./{{ report.id }}'">
                 <img src="{{ report.image.url }}" class="card-image" loading="lazy">
                 <div class="card-details">
                     <span class="status-badge">{{ report.condition }}</span>
 
                     <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                        </svg>
-                        {{ report.city }}
+                        📍 {{ report.city }}
                     </div>
                     <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                        </svg>
-                        {{ report.address }}
+                        🏠 {{ report.address }}
                     </div>
                     <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        {{ report.date }}
+                        📅 {{ report.date }}
                     </div>
-                    <div class="detail-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Verified: {{ report.verified|yesno:"Yes,No" }}
-                    </div>
-                    <!-- Add other global report details here -->
+
                 </div>
             </div>
             {% endfor %}
         </div>
+    </div>
 
-        <!-- Floating Action Button -->
-        <div class="fab" onclick="window.location.href='../form/'">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+    <!-- Mobile Sections -->
+    <div class="map-section mobile-section active">
+        <h2 style="color: var(--primary); margin-bottom: 1rem;">🗺️ Incident Map</h2>
+        <div id="map-mobile"></div>
+    </div>
+
+    <select class="mobile-selector" id="mobileSelect">
+        <option value="user">User Reports</option>
+        <option value="global">Global Reports</option>
+    </select>
+
+    <div class="left-section mobile-section" id="mobileUser">
+        <h2 style="color: var(--user-accent); margin-bottom: 1.5rem;">📋 Your Reports</h2>
+        {% for subm in usersubm %}
+        <div class="report-card user-report-card" onclick="window.location.href='./{{ subm.id }}'">
+            <img src="{{ subm.image.url }}" class="card-image" loading="lazy">
+            <div class="card-details">
+                <span class="status-badge">{{ subm.condition }}</span>
+
+                <div class="detail-row">
+                    📅 {{ subm.date }}
+                </div>
+                <div class="detail-row">
+                    📍 {{ subm.city }}
+                </div>
+                <div class="detail-row">
+                    ✉️ {{ subm.email }}
+                </div>
+                <div class="detail-row">
+                    🏠 {{ subm.address }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="global-reports mobile-section" id="mobileGlobal">
+        <h2 style="color: var(--global-accent); margin-bottom: 1.5rem;">🌍 Global Reports</h2>
+        {% for report in storedReports %}
+        <div class="report-card global-report-card" onclick="window.location.href='./{{report.id}}' ">
+            <img src="{{ report.image.url }}" class="card-image" loading="lazy">
+            <div class="card-details">
+                <span class="status-badge">{{ report.condition }}</span>
+
+                <div class="detail-row">
+                    📍 {{ report.city }}
+                </div>
+                <div class="detail-row">
+                    🏠 {{ report.address }}
+                </div>
+                <div class="detail-row">
+                    📅 {{ report.date }}
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab" onclick="window.location.href='/form/'">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                 stroke="currentColor" width="24" height="24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
-        </div>
     </div>
+</div>
 
     {{ location_data|json_script:"storedReportsData" }}
 
     <script>
-        // Map initialization
-        function initMap(elementId) {
-            const map = L.map(elementId).setView([30.3753, 69.3451], 6);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            return map;
-        }
+        // Initialize Map
+        const map = L.map('map', {
+            zoomControl: false
+        }).setView([30.3753, 69.3451], 6);
 
-        // Initialize desktop and mobile maps
-        const desktopMap = initMap('map');
-        const mobileMap = initMap('map-mobile');
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
 
-        // Add markers to both maps
+        // Add markers
         const storedReports = JSON.parse(document.getElementById('storedReportsData').textContent);
         storedReports.forEach(location => {
-            const marker = L.marker([location.latitude, location.longitude])
-                .bindPopup(`<b>${location.city}</b><br>${location.condition}`);
-
-            marker.addTo(desktopMap);
-            marker.addTo(mobileMap);
+            L.marker([location.latitude, location.longitude])
+                .addTo(map)
+                .bindPopup(`
+                    <div style="min-width: 200px">
+                        <strong>${location.city}</strong><br>
+                        ${location.address}<br>
+                        Status: ${location.condition}
+                    </div>
+                `);
         });
 
-        // Mobile section toggle
         const mobileSelect = document.getElementById('mobileSelect');
         mobileSelect.addEventListener('change', (e) => {
             document.querySelectorAll('.mobile-section').forEach(section => {
@@ -487,10 +390,7 @@
         });
 
         // Handle window resize
-        window.addEventListener('resize', () => {
-            desktopMap.invalidateSize();
-            mobileMap.invalidateSize();
-        });
+        window.addEventListener('resize', () => map.invalidateSize());
     </script>
 </body>
 

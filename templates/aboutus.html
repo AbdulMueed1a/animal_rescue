@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - PawsomeRescue</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        :root {
+            --primary: #FF7F50;
+            --secondary: #4ECDC4;
+            --dark: #2F4858;
+            --light: #F9F9F9;
+        }
+
+        body {
+            background-color: var(--light);
+            line-height: 1.6;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)),
+                url('https://images.unsplash.com/photo-1425082661705-1834bfd09dca') center/cover fixed;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            transform: translateZ(0);
+        }
+
+        .hero-content {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease forwards 0.3s;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .description-section {
+            max-width: 1200px;
+            margin: 6rem auto;
+            padding: 0 5%;
+        }
+
+        .description-content {
+            background: white;
+            padding: 4rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .description-content h2 {
+            color: var(--dark);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .description-content h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .description-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .description-text1 {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #ffffff;
+        }
+
+
+
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 5%;
+            text-align: center;
+        }
+
+        .legal-links a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .description-content {
+                padding: 2rem;
+            }
+
+            .description-content h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .description-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>About Our Mission</h1>
+            <p class="description-text1">Compassionate care for every creature</p>
+        </div>
+    </section>
+
+    <div class="description-section">
+        <div class="description-content">
+            <h2>Our Commitment</h2>
+            <div class="description-text">
+                <!-- Add your detailed description here -->
+                <p>At PawsomeRescue, we dedicate ourselves to creating a world where every animal receives the care and
+                    respect they deserve. Our journey began with a simple idea: that compassion for all living
+                    creatures forms the foundation of a humane society.</p>
+
+                <ul style="margin: 1.5rem 0; padding-left: 1.5rem;">
+                    <li style="margin-bottom: 0.8rem;">Provide emergency medical care and rehabilitation</li>
+                    <li style="margin-bottom: 0.8rem;">Facilitate loving adoptions through our network</li>
+                    <li style="margin-bottom: 0.8rem;">Educate communities about animal welfare</li>
+                    <li>Advocate for stronger animal protection laws</li>
+                </ul>
+
+                <p>Our approach combines hands-on rescue operations with strategic partnerships, ensuring we make the
+                    maximum impact with every resource. We believe transparency is key to building trust, which is why
+                    we maintain open communication with our supporters through regular updates and financial reports.
+                </p>
+
+                <p>What drives us forward is the knowledge that every life we touch represents a story of transformation
+                    - from neglect to care, from suffering to comfort, and from abandonment to loving homes.</p>
+
+                <p>me and my team of 4 we believe in helping the voiceless and to help the we made this website as a
+                    heckathon project about providing social global-report-card</p>
+                <h4>This is our Family</h4>
+                <ul style="margin: 1.5rem 0; padding-left: 1.5rem;">
+                    <li style="margin-bottom: 0.8rem;">Abdul Mueed: Backend Expert and a Master of Bot building</li>
+                    <li style="margin-bottom: 0.8rem;">Ali Mardan: A Game dev Working on Unity</li>
+                    <li style="margin-bottom: 0.8rem;">Abdul Aziz Mangrio</li>
+                    <li style="margin-bottom: 0.8rem;"> Zain Jamali</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p class="mission-statement">We are committed to creating a community that cares for animals and the
+                environment. Our platform connects individuals, rescue organizations, and volunteers to provide swift
+                assistance to animals in need.</p>
+
+            <div class="legal-links">
+                <a href="/">Home</a>
+                <span>|</span>
+                <a href="/privacy">Privacy Policy</a>
+                <span>|</span>
+                <a href="/terms">Terms of Service</a>
+                <span>|</span>
+                <a href="/contact">Contact</a>
+            </div>
+
+            <div class="copyright">
+                <p>© 2024 PawsomeRescue. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

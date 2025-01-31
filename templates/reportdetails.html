@@ -1,4 +1,6 @@
+{% load static %}
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -92,82 +94,34 @@
 <body>
     <div class="container">
         <div class="image-section">
-            <img id="product-image" src="https://m.media-amazon.com/images/I/71bug9J4YOL._AC_SL1500_.jpg" alt="Product">
+            <img id="product-image" src="{{ report.image.url }}" alt="Product">
         </div>
         <div class="details-section">
             <h1 id="about-report" class="about_report">About Report</h1>
             <!-- Contact Number -->
-            <h3>Reporter Contect No</h3>
-            <p id="contect-no" class="contect-no">contect-no</p>
+            <h3>Contact Number</h3>
+            <p id="contect-no" class="contect-no">{{ report.contact }}</p>
             <!-- Reporter Emial -->
             <h3>Reporter Email</h3>
-            <p id="reporter-email" class="reporter-email">reporter-email.</p>
+            <p id="reporter-email" class="reporter-email">{{ report.email }}</p>
             <!-- Select a date (optional): -->
             <h3>Report Date</h3>
-            <p id="report-date" class="report-date">report-date.</p>
+            <p id="report-date" class="report-date">{{ report.date }}</p>
             <!-- City: -->
             <h3>City</h3>
-            <p id="city" class="city">city.</p>
+            <p id="city" class="city">{{ report.city }}</p>
             <!-- Location: -->
             <h3>Address</h3>
-            <p id="address" class="address">address.</p>
+            <p id="address" class="address">{{ report.address }}</p>
             <!-- What Animal -->
             <h3>Animal Kind</h3>
-            <p id="animal-kind" class="animal-kind">animal-kind.</p>
+            <p id="animal-kind" class="animal-kind">{{ report.animal }}</p>
             <!-- Condition of the Animal: -->
             <h3>Animal Condition</h3>
-            <p id="condition" class="condition">condition.</p>
+            <p id="condition" class="condition">{{ report.condition }}</p>
             <!-- Description: -->
             <h3>Other Details</h3>
-            <p id="product-description" class="product-description">Lorem ipsum dolor sit amet consectetur adipisicing
-                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
-                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
-                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
-                officia.
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
-                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
-                est corrupti accusamus cum aspernatur.Lorem ipsum dolor sit amet consectetur adipisicing
-                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
-                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
-                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
-                officia.
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
-                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
-                est corrupti accusamus cum aspernatur.Lorem ipsum dolor sit amet consectetur adipisicing
-                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
-                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
-                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
-                officia.
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
-                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
-                est corrupti accusamus cum aspernatur.Lorem ipsum dolor sit amet consectetur adipisicing
-                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
-                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
-                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
-                officia.
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
-                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
-                est corrupti accusamus cum aspernatur.Lorem ipsum dolor sit amet consectetur adipisicing
-                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
-                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
-                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
-                officia.
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
-                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
-                est corrupti accusamus cum aspernatur.Lorem ipsum dolor sit amet consectetur adipisicing
-                elit. Ipsum, quod itaque. Laborum cupiditate sapiente molestias voluptas magni quae voluptate officia
-                veniam obcaecati autem alias ut, odit id vitae sequi voluptatem?
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aut asperiores ipsa. Ipsa, recusandae
-                explicabo a tenetur inventore hic neque in, quisquam animi error quibusdam dignissimos quia eos sunt
-                officia.
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, ducimus asperiores architecto quibusdam
-                fuga animi minima, explicabo unde nulla voluptates exercitationem tempore saepe reiciendis perspiciatis
-                est corrupti accusamus cum aspernatur.</p>
+            <p id="product-description" class="product-description">{{ report.discription }}</p>
         </div>
     </div>
 </body>

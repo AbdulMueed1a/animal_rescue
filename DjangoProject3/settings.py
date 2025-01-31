@@ -36,11 +36,11 @@ SECRET_KEY = logindetails.key
 DEBUG = "True"
 # DEBUG = os.environ.get("DEBUG","false").lower()=="true"
 
-ALLOWED_HOSTS = ["a135-2404-3100-140d-ffb7-bc0e-36d5-6338-1b66.ngrok-free.app" , "127.0.0.1" ,"localhost"]
+ALLOWED_HOSTS = [".ngrok-free.app" , "127.0.0.1" ,"localhost"]
 # ALLOWED_HOSTS = [".vercel.app"]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://a135-2404-3100-140d-ffb7-bc0e-36d5-6338-1b66.ngrok-free.app',  # Add your ngrok URL with HTTPS
+    'https://c404-203-109-42-158.ngrok-free.app',  # Add your ngrok URL with HTTPS
     'http://localhost:8000',  # Include localhost for non-HTTPS testing
 ]
 
