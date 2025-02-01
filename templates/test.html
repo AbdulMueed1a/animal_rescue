@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PawsomeRescue</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        :root {
+            --primary: #FF7F50;
+            --secondary: #4ECDC4;
+            --dark: #2F4858;
+            --light: #F9F9F9;
+        }
+
+        body {
+            background-color: var(--light);
+            line-height: 1.6;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            background-color: rgba(255, 255, 255, 0.95);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -1px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)),
+                url('https://media.11alive.com/assets/CCT/images/a2f1c114-07da-4e86-9bca-2ca50ef5c72e/a2f1c114-07da-4e86-9bca-2ca50ef5c72e_1140x641.jpg') center/cover fixed;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            transform: translateZ(0);
+        }
+
+        .hero-content {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease forwards 0.3s;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        .section {
+            padding: 6rem 5%;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary), #FF6347);
+            color: white;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 127, 80, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 127, 80, 0.4);
+        }
+
+        .mission-section {
+            background: white;
+            padding: 4rem 5%;
+            text-align: center;
+        }
+
+        .mission-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+
+        .mission-card {
+            background: var(--light);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .partners {
+            text-align: center;
+            padding: 2rem 0;
+            background: var(--dark);
+            color: white;
+        }
+
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 5%;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .mission-statement {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .image-credits {
+            margin: 2rem 0;
+            padding: 1.5rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .image-credits p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .legal-links {
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .legal-links a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .legal-links a:hover {
+            opacity: 0.8;
+        }
+
+        .legal-links span {
+            opacity: 0.5;
+        }
+
+        .copyright {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Styles */
+        .menu-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+
+        @media screen and (max-width: 1024px) {
+            .nav-links {
+                gap: 1.5rem;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            nav {
+                padding: 1rem 5%;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                padding: 1rem;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+            .mission-columns {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .grid {
+                gap: 1.5rem;
+            }
+
+            .section {
+                padding: 4rem 5%;
+            }
+
+            .mission-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="logo">PawsomeRescue</div>
+        <div class="menu-toggle">☰</div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#mission">Mission</a>
+            <a href="#work">How It Works</a>
+            <a href="#aboutus">About Us</a>
+            <a href="#login">Login</a>
+            <a href="#signup">SignUp</a>
+        </div>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Give a Furry Friend a Forever Home</h1>
+            <p>Join us in our mission to rescue, rehabilitate, and rehome animals in need. Your support changes lives,
+                one paw at a time.</p>
+            <button class="cta-button">Adopt Now</button>
+        </div>
+    </section>
+
+    <section class="mission-section" id="mission">
+        <h2>Our Mission</h2>
+        <div class="mission-columns">
+            <div class="mission-card">
+                <h3>Help the Voiceless</h3>
+                <p>Educating the community about responsible animal care and advocating for animal welfare and rights.
+                </p>
+            </div>
+            <div class="mission-card">
+                <h3>Be the Cause</h3>
+                <p>Together, we can make a difference in the lives of countless animals and create a world where every
+                    animal is loved and cherished.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="work">
+        <h2>How It Works</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Step 1: Find Help Nearby</h3>
+                <p>Our app helps you find the nearest veterinary hospitals, NGOs, or rescue organizations on the map.
+                </p>
+                <button class="cta-button">Browse Services</button>
+            </div>
+            <div class="card">
+                <h3>Step 2: Submit Report</h3>
+                <p>Fill out a simple form with essential details and photos to help responders understand the situation.
+                </p>
+                <button class="cta-button">Submit Report</button>
+            </div>
+            <div class="card">
+                <h3>Step 3: Get Assistance</h3>
+                <p>Nearest organizations receive alerts while community members can offer transportation or support.</p>
+                <button class="cta-button">Get Help</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="aboutus">
+        <h2>About Us</h2>
+        <div class="card">
+            <p>Our app helps you find the nearest veterinary hospitals, NGOs, or rescue organizations on the map. </p>
+            <p>We are a passionate team dedicated to the welfare of animals and the environment. Our mission is to
+                bridge
+                the gap between those who witness animals in distress and those who can provide immediate help. With our
+                innovative web platform, we empower individuals to take action, connect with local rescue organizations,
+                and
+                create a compassionate community for animals in need. Our project provides a seamless way to report
+                animal
+                injuries or pollution issues by allowing users to share details and locations through an intuitive
+                interface. By collaborating with veterinary hospitals, NGOs, and volunteers, we aim to ensure timely
+                intervention and care for animals. At the heart of our initiative is the belief that every life matters.
+                Together, we can create a world where kindness and compassion extend to all living beings.</p>
+            <button class="cta-button">Learn more </button>
+        </div>
+    </section>
+
+
+    <footer>
+        <div class="footer-content">
+            <p class="mission-statement">We are committed to creating a community that cares for animals and the
+                environment. Our platform connects individuals, rescue organizations, and volunteers to provide swift
+                assistance to animals in need. Join us in building a compassionate and responsible world for all living
+                beings.</p>
+
+            <div class="image-credits">
+                <p>• All images used in this project are credited to their respective owners.</p>
+                <p>• No copyright infringement intended. Images are used for informational, illustrative and education
+                    purposes only.</p>
+            </div>
+
+            <div class="legal-links">
+                <a href="/privacy">Privacy Policy</a>
+                <span>|</span>
+                <a href="/terms">Terms of Service</a>
+                <span>|</span>
+                <a href="/contact">Contact</a>
+            </div>
+
+            <div class="copyright">
+                <p>© 2024 PawsomeRescue. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Close menu on click outside
+        document.addEventListener('click', (e) => {
+            if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+
+        // Intersection Observer for animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    if (entry.target.classList.contains('card')) {
+                        entry.target.style.transitionDelay = `${entry.target.dataset.delay || 0}ms`;
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+
+        // Observe elements
+        document.querySelectorAll('.section, .mission-card').forEach(el => observer.observe(el));
+        document.querySelectorAll('.card').forEach((card, index) => {
+            card.dataset.delay = index * 100;
+            observer.observe(card);
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                window.scrollTo({
+                    top: target.offsetTop - 90,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            nav.style.padding = window.scrollY > 50 ? '1rem 5%' : '1.5rem 5%';
+            nav.style.boxShadow = window.scrollY > 50 ? '0 4px 15px rgba(0,0,0,0.1)' : 'none';
+        });
+    </script>
+</body>
+
+</html>

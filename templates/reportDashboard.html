@@ -25,7 +25,66 @@
 
         body {
             padding: 20px;
+            padding-top: 80px;
         }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            background-color: rgba(255, 255, 255, 0.95);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            height: 70px;
+            /* Ensure fixed height */
+            line-height: 70px;
+            /* Vertically center text */
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -1px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+
+
 
         .container {
             display: flex;
@@ -192,8 +251,8 @@
             }
 
             /* .map-section {
-                height: 50vh;
-            } */
+                    height: 50vh;
+                } */
 
             .mobile-section.active {
                 display: block;
@@ -206,6 +265,53 @@
 
             .card-image {
                 height: 150px;
+            }
+        }
+
+
+        /* Mobile Styles */
+        .menu-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+
+        @media screen and (max-width: 1024px) {
+            .nav-links {
+                gap: 1.5rem;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            nav {
+                padding: 1rem 5%;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                padding: 1rem;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             }
         }
 
@@ -230,42 +336,142 @@
 </head>
 
 <body>
-    <div class="container">
-    <!-- Desktop Sections -->
-    <div class="left-section">
-        <h2 style="color: var(--user-accent); margin-bottom: 1.5rem;">📋 Your Reports</h2>
-        {% for subm in usersubm %}
-        <div class="report-card user-report-card" onclick="window.location.href='./{{ subm.id }}'">
-            <img src="{{ subm.image.url }}" class="card-image" loading="lazy">
-            <div class="card-details">
-                <span class="status-badge">{{ subm.condition }}</span>
 
-                <div class="detail-row">
-                    📅 {{ subm.date }}
-                </div>
-                <div class="detail-row">
-                    📍 {{ subm.city }}
-                </div>
-                <div class="detail-row">
-                    ✉️ {{ subm.email }}
-                </div>
-                <div class="detail-row">
-                    🏠 {{ subm.address }}
+    <nav>
+        <div class="logo">PawsomeRescue</div>
+        <div class="menu-toggle">☰</div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            {% if user.is_superuser %}
+            <a href="/admin/">Admin Page</a>
+            {% else %}
+            <a href="#mission">Mission</a>
+            {% endif %}
+
+            {% with user.groups.all as groups %}
+            {% if user.is_superuser %}
+            <a href="/reports/">Monitor Reports</a>
+            {% else %}
+            {% for group in groups %}
+            {% if group.name == "supervisor" %}
+            <a href="/reports/">Monitor Reports</a>
+            {% with found=1 %}{% endwith %}
+            {% endif %}
+            {% endfor %}
+            {% if not found %}
+            <a href="#work">How It Works</a>
+            {% endif %}
+            {% endif %}
+            {% endwith %}
+
+            <a href="#aboutus">About Us</a>
+            {% if user.is_authenticated %}
+            <a type="button" href="/dashboard/" id="dasboard">Dashboard</a>
+            <a type="button" href="user/logout" id="logout">LogOut</a>
+            {% else %}
+            <a type="button" href="user/signup" id="signup">SignUp</a>
+            <a type="button" href="user/login" id="signup">LogIn</a>
+            {% endif %}
+        </div>
+    </nav>
+
+
+    <div class="container">
+        <!-- Desktop Sections -->
+        <div class="left-section">
+            <h2 style="color: var(--user-accent); margin-bottom: 1.5rem;">📋 Your Reports</h2>
+            {% for subm in usersubm %}
+            <div class="report-card user-report-card" onclick="window.location.href='./{{ subm.id }}'">
+                <img src="{{ subm.image.url }}" class="card-image" loading="lazy">
+                <div class="card-details">
+                    <span class="status-badge">{{ subm.condition }}</span>
+
+                    <div class="detail-row">
+                        📅 {{ subm.date }}
+                    </div>
+                    <div class="detail-row">
+                        📍 {{ subm.city }}
+                    </div>
+                    <div class="detail-row">
+                        ✉️ {{ subm.email }}
+                    </div>
+                    <div class="detail-row">
+                        🏠 {{ subm.address }}
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
 
-    <div class="right-column">
-        <div class="map-section">
-            <h2 style="color: var(--primary); margin-bottom: 1rem;">🗺️ Incident Map</h2>
-            <div id="map"></div>
+        <div class="right-column">
+            <div class="map-section">
+                <h2 style="color: var(--primary); margin-bottom: 1rem;">🗺️ Incident Map</h2>
+                <div id="map"></div>
+            </div>
+            <div class="global-reports">
+                <h2 style="color: var(--global-accent); margin-bottom: 1.5rem;">🌍 Global Reports</h2>
+                {% for report in storedReports %}
+                <div class="report-card global-report-card" onclick="window.location.href='./{{ report.id }}'">
+                    <img src="{{ report.image.url }}" class="card-image" loading="lazy">
+                    <div class="card-details">
+                        <span class="status-badge">{{ report.condition }}</span>
+
+                        <div class="detail-row">
+                            📍 {{ report.city }}
+                        </div>
+                        <div class="detail-row">
+                            🏠 {{ report.address }}
+                        </div>
+                        <div class="detail-row">
+                            📅 {{ report.date }}
+                        </div>
+
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        <div class="global-reports">
+
+        <!-- Mobile Sections -->
+        <div class="map-section mobile-section active">
+            <h2 style="color: var(--primary); margin-bottom: 1rem;">🗺️ Incident Map</h2>
+            <div id="map-mobile"></div>
+        </div>
+
+        <select class="mobile-selector" id="mobileSelect">
+            <option value="user">User Reports</option>
+            <option value="global">Global Reports</option>
+        </select>
+
+        <div class="left-section mobile-section" id="mobileUser">
+            <h2 style="color: var(--user-accent); margin-bottom: 1.5rem;">📋 Your Reports</h2>
+            {% for subm in usersubm %}
+            <div class="report-card user-report-card" onclick="window.location.href='./{{ subm.id }}'">
+                <img src="{{ subm.image.url }}" class="card-image" loading="lazy">
+                <div class="card-details">
+                    <span class="status-badge">{{ subm.condition }}</span>
+
+                    <div class="detail-row">
+                        📅 {{ subm.date }}
+                    </div>
+                    <div class="detail-row">
+                        📍 {{ subm.city }}
+                    </div>
+                    <div class="detail-row">
+                        ✉️ {{ subm.email }}
+                    </div>
+                    <div class="detail-row">
+                        🏠 {{ subm.address }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="global-reports mobile-section" id="mobileGlobal">
             <h2 style="color: var(--global-accent); margin-bottom: 1.5rem;">🌍 Global Reports</h2>
             {% for report in storedReports %}
-            <div class="report-card global-report-card" onclick="window.location.href='./{{ report.id }}'">
+            <div class="report-card global-report-card" onclick="window.location.href='./{{report.id}}' ">
                 <img src="{{ report.image.url }}" class="card-image" loading="lazy">
                 <div class="card-details">
                     <span class="status-badge">{{ report.condition }}</span>
@@ -284,75 +490,15 @@
             </div>
             {% endfor %}
         </div>
-    </div>
 
-    <!-- Mobile Sections -->
-    <div class="map-section mobile-section active">
-        <h2 style="color: var(--primary); margin-bottom: 1rem;">🗺️ Incident Map</h2>
-        <div id="map-mobile"></div>
-    </div>
-
-    <select class="mobile-selector" id="mobileSelect">
-        <option value="user">User Reports</option>
-        <option value="global">Global Reports</option>
-    </select>
-
-    <div class="left-section mobile-section" id="mobileUser">
-        <h2 style="color: var(--user-accent); margin-bottom: 1.5rem;">📋 Your Reports</h2>
-        {% for subm in usersubm %}
-        <div class="report-card user-report-card" onclick="window.location.href='./{{ subm.id }}'">
-            <img src="{{ subm.image.url }}" class="card-image" loading="lazy">
-            <div class="card-details">
-                <span class="status-badge">{{ subm.condition }}</span>
-
-                <div class="detail-row">
-                    📅 {{ subm.date }}
-                </div>
-                <div class="detail-row">
-                    📍 {{ subm.city }}
-                </div>
-                <div class="detail-row">
-                    ✉️ {{ subm.email }}
-                </div>
-                <div class="detail-row">
-                    🏠 {{ subm.address }}
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <div class="global-reports mobile-section" id="mobileGlobal">
-        <h2 style="color: var(--global-accent); margin-bottom: 1.5rem;">🌍 Global Reports</h2>
-        {% for report in storedReports %}
-        <div class="report-card global-report-card" onclick="window.location.href='./{{report.id}}' ">
-            <img src="{{ report.image.url }}" class="card-image" loading="lazy">
-            <div class="card-details">
-                <span class="status-badge">{{ report.condition }}</span>
-
-                <div class="detail-row">
-                    📍 {{ report.city }}
-                </div>
-                <div class="detail-row">
-                    🏠 {{ report.address }}
-                </div>
-                <div class="detail-row">
-                    📅 {{ report.date }}
-                </div>
-
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- Floating Action Button -->
-    <div class="fab" onclick="window.location.href='/form/'">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        <!-- Floating Action Button -->
+        <div class="fab" onclick="window.location.href='/form/'">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                 stroke="currentColor" width="24" height="24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
+        </div>
     </div>
-</div>
 
     {{ location_data|json_script:"storedReportsData" }}
 
@@ -373,12 +519,12 @@
             L.marker([location.latitude, location.longitude])
                 .addTo(map)
                 .bindPopup(`
-                    <div style="min-width: 200px">
-                        <strong>${location.city}</strong><br>
-                        ${location.address}<br>
-                        Status: ${location.condition}
-                    </div>
-                `);
+                        <div style="min-width: 200px">
+                            <strong>${location.city}</strong><br>
+                            ${location.address}<br>
+                            Status: ${location.condition}
+                        </div>
+                    `);
         });
 
         const mobileSelect = document.getElementById('mobileSelect');
