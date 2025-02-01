@@ -16,6 +16,7 @@ urlpatterns = [
     path('aboutus/', views.aboutus , name='aboutus' ),
     path('save-fcm-token/', views.save_fcm_token, name='save_fcm_token'),
     path('toggle-notifications/', views.toggle_notifications, name='toggle_notifications'),
+    path('toggle-mail-notifications/', views.toggle_mail_notifications, name='toggle-mail-notifications'),
     path('delete-fcm-token/', views.delete_fcm_token, name='delete_fcm_token'),
     path('update-fcm-token/', views.update_fcm_token, name='update_fcm_token')
 ]

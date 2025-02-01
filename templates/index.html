@@ -505,8 +505,9 @@
 
             <!-- In your footer section where the notification button is -->
             {% if user.is_authenticated %}
-                <button onclick="toggleNotifications()"
-                        id="notification-btn"
+                <!-- Push Notifications Toggle -->
+                <button onclick="togglePushNotifications()"
+                        id="push-notification-btn"
                         class="{{ user.profile.pushnoti|yesno:'enabled,disabled' }}">
                     {% if user.profile.pushnoti %}
                         🔔 Disable Push-Notifications
@@ -514,18 +515,19 @@
                         🔕 Enable Push-Notifications
                     {% endif %}
                 </button>
-            {% endif %}
-                {% if user.is_authenticated %}
-                <button onclick="toggleNotifications()"
-                        id="notification-btn"
-                        class="{{ user.profile.pushnoti|yesno:'enabled,disabled' }}">
-                    {% if user.profile.pushnoti %}
-                        🔔 Disable Mail-Notifications
+
+                <!-- Mail Notifications Toggle -->
+                <button onclick="toggleMailNotifications()"
+                        id="mail-notification-btn"
+                        class="{{ user.profile.mailnoti|yesno:'enabled,disabled' }}">
+                    {% if user.profile.mailnoti %}
+                        📧 Disable Mail-Notifications
                     {% else %}
-                        🔕 Enable Mail-Notifications
+                        📬 Enable Mail-Notifications
                     {% endif %}
                 </button>
             {% endif %}
+
 
             <div class="legal-links">
                 <a href="/privacy">Privacy Policy</a>
@@ -541,7 +543,7 @@
         </div>
     </footer>
      <script>
-    // Firebase configuration and initialization
+    // Firebase configuration and initialization for push notifications
     const firebaseConfig = {
         apiKey: "AIzaSyA80SmOpP14bbtiVj2OA363_Cp8Hm0_W50",
         authDomain: "animal-rescue-portal.firebaseapp.com",
@@ -552,7 +554,7 @@
         measurementId: "G-4DDP7997KY"
     };
 
-    // Initialize Firebase
+    // Initialize Firebase for push notifications
     const app = firebase.initializeApp(firebaseConfig);
     const messaging = firebase.messaging();
 
@@ -566,55 +568,58 @@
             });
     }
 
-    // Notification Control Functions
-    async function toggleNotifications() {
-    const btn = document.getElementById('notification-btn');
-    try {
-        const response = await fetch('/toggle-notifications/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+    // ------------- Push Notifications Functions ------------- //
+
+    // Toggle push notifications
+    async function togglePushNotifications() {
+        const btn = document.getElementById('push-notification-btn');
+        try {
+            const response = await fetch('/toggle-push-notifications/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                // Update button text and class based on new push notification state
+                btn.textContent = data.pushnoti ? '🔔 Disable Push-Notifications' : '🔕 Enable Push-Notifications';
+                btn.classList.toggle('enabled', data.pushnoti);
+                btn.classList.toggle('disabled', !data.pushnoti);
             }
-        });
-
-        const data = await response.json();
-        if(data.status === 'success') {
-            btn.textContent = data.pushnoti ? '🔔 Disable' : '🔕 Enable';
-            btn.classList.toggle('enabled', data.pushnoti);
-            btn.classList.toggle('disabled', !data.pushnoti);
+        } catch (error) {
+            console.error('Toggle push notifications failed:', error);
         }
-    } catch(error) {
-        console.error('Toggle failed:', error);
     }
-}
 
-    async function enableNotifications() {
+    // Request permission and get FCM token for push notifications
+    async function enablePushNotifications() {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
             const token = await messaging.getToken({
                 vapidKey: 'BNmjhTKr3tR05Ct4P3EGqdxown9waj1HOPOTm2DrpTuSHc7Vi2m9bRamZ7hXZfE92gtQFmto8BIqcfj1hEWRmFo'
             });
-
             if (token) {
                 await saveTokenToBackend(token);
-                updateButtonState(true);
                 localStorage.setItem('fcmToken', token);
+                updatePushButtonState(true);
             }
         }
     }
 
-    async function disableNotifications() {
+    async function disablePushNotifications() {
         const token = await messaging.getToken();
         if (token) {
             await messaging.deleteToken(token);
             await deleteTokenFromBackend(token);
         }
         localStorage.removeItem('fcmToken');
-        updateButtonState(false);
+        updatePushButtonState(false);
     }
 
-    // Backend Communication
+    // Save FCM token to backend
     async function saveTokenToBackend(token) {
         await fetch('/save-fcm-token/', {
             method: 'POST',
@@ -626,6 +631,7 @@
         });
     }
 
+    // Delete FCM token from backend
     async function deleteTokenFromBackend(token) {
         await fetch('/delete-fcm-token/', {
             method: 'POST',
@@ -637,24 +643,55 @@
         });
     }
 
-    // UI Updates
-    function updateButtonState(isEnabled) {
-        const button = document.getElementById('notification-button');
-        button.textContent = isEnabled ? 'Disable Notifications' : 'Enable Notifications';
-        button.style.backgroundColor = isEnabled ? '#ff4444' : '#ffb727';
+    // Update push notifications button UI
+    function updatePushButtonState(isEnabled) {
+        const btn = document.getElementById('push-notification-btn');
+        btn.textContent = isEnabled ? '🔔 Disable Push-Notifications' : '🔕 Enable Push-Notifications';
+        btn.style.backgroundColor = isEnabled ? '#ff4444' : '#ffb727';
     }
 
-    // Initial State Check
-    function initializeNotificationState() {
+    // Initialize push notification state
+    function initializePushNotificationState() {
         const storedToken = localStorage.getItem('fcmToken');
-        updateButtonState(!!storedToken);
+        updatePushButtonState(!!storedToken);
     }
 
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', initializeNotificationState);
+    // ------------- Mail Notifications Functions ------------- //
 
-    // Rest of your existing animations and other code...
+    // Toggle mail notifications
+    async function toggleMailNotifications() {
+    const btn = document.getElementById('mail-notification-btn');
+    try {
+        const response = await fetch('/toggle-mail-notifications/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+        const data = await response.json(); // Now this should correctly parse
+        if (data.status === 'success') {
+            btn.textContent = data.mailnoti ? '📧 Disable Mail-Notifications' : '📬 Enable Mail-Notifications';
+            btn.classList.toggle('enabled', data.mailnoti);
+            btn.classList.toggle('disabled', !data.mailnoti);
+        }
+    } catch (error) {
+        console.error('Toggle mail notifications failed:', error);
+    }
+}
+
+
+    // (Optional) You might want to initialize mail notifications UI state.
+    // This could be done via an AJAX call to get the current status or simply
+    // rely on the rendered template.
+
+    // ------------- Initial Setup ------------- //
+    document.addEventListener('DOMContentLoaded', () => {
+        initializePushNotificationState();
+        // Optionally, you can add an initialization for mail notifications if needed.
+    });
 </script>
+
 </script>
     <script>
         // Mobile menu toggle

@@ -32,6 +32,17 @@ def index(request):
 def aboutus(request):
     return render(request, 'aboutus.html')
 
+def toggle_mail_notifications(request):
+    user_profile = request.user.profile
+    # Toggle the mail notification setting
+    user_profile.mailnoti = not user_profile.mailnoti
+    user_profile.save()
+
+    # Return the new state as JSON
+    return JsonResponse({
+        'status': 'success',
+        'mailnoti': user_profile.mailnoti
+    })
 
 @require_POST
 @login_required
@@ -350,14 +361,4 @@ def reportdetails(request, report_id):
     report = get_object_or_404(submission, id=report_id)
     return render(request, 'reportdetails.html', {'report': report})
 
-def Mailnoti_en(request):
-    if request.method == "POST":
-        profile = Profile.objects.get(user=request.user)
-        profile.mailnoti = True
-    return redirect()
 
-def Mailnoti_dis(request):
-    if request.method == "POST":
-        noti = get_object_or_404(User, username=request.user.username)
-        noti.profile.mailnoti = False
-    return redirect(request.site)
