@@ -14,7 +14,8 @@ urlpatterns = [
     path('', views.index , name='home'),
     path('rescue_submit/', views.rescue_submit , name='submit'),
     path('aboutus/', views.aboutus , name='aboutus' ),
-    path('save-fcm-token/', views.save_fcm_token, name='save_fcm_token')
-    path('delete-fcm-token/', views.deletquite_fcm_token, name='delete_fcm_token')
+    path('save-fcm-token/', views.save_fcm_token, name='save_fcm_token'),
+    path('toggle-notifications/', views.toggle_notifications, name='toggle_notifications'),
+    path('delete-fcm-token/', views.delete_fcm_token, name='delete_fcm_token'),
     path('update-fcm-token/', views.update_fcm_token, name='update_fcm_token')
 ]

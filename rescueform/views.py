@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import FCMToken
 
 # Create your views here.
-@login_required(login_url='/login/')
+@login_required(login_url='/user/login/')
 def form(request):
     try:
         initialize_firebase()
@@ -22,14 +22,30 @@ def form(request):
     return render(request,'form.html')
 
 def index(request):
-    if request.user.is_authenticated:
-
-        wants_email = request.user.profile.mailnoti
-        wants_push = request.user.profile.pushnoti
     return render(request, 'index.html')
 
 def aboutus(request):
     return render(request, 'aboutus.html')
+
+
+@require_POST
+@login_required
+def toggle_notifications(request):
+    try:
+        profile = request.user.profile
+        profile.pushnoti = not profile.pushnoti
+        profile.save()
+
+        if not profile.pushnoti:
+            # Optional: Delete FCM token when disabling
+            request.user.fcmtoken.delete()
+
+        return JsonResponse({
+            'status': 'success',
+            'pushnoti': profile.pushnoti
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 def reverse_geocode(lat, lon, city=False):
     url = "https://nominatim.openstreetmap.org/reverse"
@@ -72,6 +88,9 @@ def delete_fcm_token(request):
     try:
         user = request.user
         FCMToken.objects.filter(user=user).delete()
+        profile, created = Profile.objects.get_or_create(user=user)
+        profile.pushnoti = False
+        profile.save()
         return JsonResponse({'status': 'success', 'message': 'Notifications disabled'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
@@ -83,6 +102,9 @@ def save_fcm_token(request):
             data = json.loads(request.body)
             token = data.get('token')
             user = request.user
+            profile, created = Profile.objects.get_or_create(user=user)
+            profile.pushnoti = True
+            profile.save()
             FCMToken.objects.update_or_create(user=user, defaults={'token': token})
             print(f"Token saved for {user.username}: {token}")  # Check terminal logs
             return JsonResponse({'status': 'success'})
@@ -147,9 +169,14 @@ def push_noti(self):
     ]
 
     from django.contrib.auth.models import User
+
     # Only send to users with FCM tokens
-    users_with_tokens = User.objects.filter(fcmtoken__isnull=False).distinct()
+    users_with_tokens = User.objects.filter(
+        fcmtoken__isnull=False,
+        profile__pushnoti=True
+    ).distinct()
     for user in users_with_tokens:
+        user.profile.pushnoti=True
         send_fcm_notification(
             user=user,
             title=random.choice(titles),
@@ -157,7 +184,7 @@ def push_noti(self):
             url=f"/dashboard/{self.id}/"
         )
 
-@login_required(login_url='/login/')
+@login_required(login_url='/user/login/')
 def rescue_submit(request):
     subm = submission()
     if request.method == "POST":
@@ -200,7 +227,7 @@ def rescue_submit(request):
         return redirect('/dashboard/')
 
 
-@login_required(login_url='/login/')
+@login_required(login_url='/user/login/')
 def my_reports(request):
     # return render(request, "reportDashboard.html", {})
     submissions =  submission.objects.filter(username=request.user.username).order_by("-id")
@@ -209,7 +236,7 @@ def my_reports(request):
     location_data=[{'latitude':sub.latitude,'longitude':sub.longitude} for sub in subs]
     return render(request, 'reportDashboard.html', {'usersubm': submissions,'storedReports': submission.objects.all().order_by("-id"), 'location_data': location_data})
 
-@login_required(login_url='/login/')
+@login_required(login_url='/user/login/')
 def emergency_report_list(request):
     if request.user.is_superuser or request.user.groups.filter(name='supervisor').exists():
         reports = submission.objects.all()
@@ -218,7 +245,7 @@ def emergency_report_list(request):
         return HttpResponseForbidden()
 
 
-login_required(login_url='/login/')
+login_required(login_url='user/login/')
 def update_status(request, report_id):
     if request.user.is_superuser or request.user.groups.filter(name='supervisor').exists():
         if request.method == "POST":
@@ -229,7 +256,7 @@ def update_status(request, report_id):
     else:
         return HttpResponseForbidden()
 
-login_required(login_url='/login/')
+login_required(login_url='user/login/')
 def delete_report(request, report_id):
     if request.user.is_superuser or request.user.groups.filter(name='supervisor').exists():
         if request.method == "POST":
@@ -239,13 +266,19 @@ def delete_report(request, report_id):
     else:
         return HttpResponseForbidden()
 
-login_required(login_url='/login/')
+login_required(login_url='user/login/')
 def reportdetails(request, report_id):
     report = get_object_or_404(submission, id=report_id)
     return render(request, 'reportdetails.html', {'report': report})
 
 def Mailnoti_en(request):
     if request.method == "POST":
+        profile = Profile.objects.get(user=request.user)
+        profile.mailnoti = True
+    return redirect()
+
+def Mailnoti_dis(request):
+    if request.method == "POST":
         noti = get_object_or_404(User, username=request.user.username)
-        noti.emailnoti = True
-    return redirect('emergency_report_list')
+        noti.profile.mailnoti = False
+    return redirect(request.site)

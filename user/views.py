@@ -25,12 +25,13 @@ def generate_otp(length=6):
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    if created:
+    if created and not hasattr(instance, 'profile'):
         Profile.objects.create(user=instance)
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
 
 def send_email(note,recipient_email):
     smtp_server = "smtp.gmail.com"  # Example: Gmail SMTP server
@@ -85,6 +86,10 @@ def register(request):
             messages.error(request, 'Username already registered')
             return redirect('signup')
 
+        mnoti=request.POST['mailnoti']
+        pnoti=request.POST['pushnoti']
+
+
         # Generate OTP and send email
         otp = generate_otp()
         send_email(otp, email)
@@ -96,7 +101,9 @@ def register(request):
             'password': password1,
             'first_name': first_name,
             'last_name': last_name,
-            'otp': otp
+            'otp': otp,
+            'mailnoti': mnoti,
+            'pushnoti': pnoti
         }
         return render(request, "otpenter.html", {'email': email})
 
@@ -114,12 +121,14 @@ def otp(request):
 
         if entered_otp == user_data['otp']:
             # OTP is correct, create the user
-            user = User.objects.create_user(
+            user = Profile.objects.create_user(
                 username=user_data['username'],
                 email=user_data['email'],
                 password=user_data['password'],
                 first_name=user_data['first_name'],
-                last_name=user_data['last_name']
+                last_name=user_data['last_name'],
+                mailNoti=user_data['mailnoti'],
+                pushnoti=user_data['pushnoti']
             )
             messages.success(request, 'Registration successful!')
             del request.session['user_data']  # Clear session data
@@ -133,8 +142,7 @@ def otp(request):
 
 def login(request):
     if request.user.is_authenticated:
-        wants_email = request.user.profile.mailnoti
-        wants_push = request.user.profile.pushnoti
+        redirect('logout/')
     if request.method == 'POST':
         username = request.POST['Email_username']
         password = request.POST['password']

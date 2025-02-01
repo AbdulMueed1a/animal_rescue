@@ -106,7 +106,7 @@ body {
     <div class="box">
         <div class="form">
             <h1>Login</h1>
-            <form method="post" action="login">
+            <form method="post" action="">
                 {% csrf_token %}
                 {% if messages %}
                     <div class="messages">
@@ -128,7 +128,7 @@ body {
                     <input type="password" id="password" name="password"required>
                 </div>
                 <h6>Don't have a Accout? Create one now!
-                    <a href="signup">SignUp</a>
+                    <a href="/user/signup/">SignUp</a>
                 </h6>
                 <input type="submit" value="submit" class="sub" id="submit">
             </form>

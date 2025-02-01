@@ -502,20 +502,19 @@
                 <p>• No copyright infringement intended. Images are used for informational, illustrative and education
                     purposes only.</p>
             </div>
-            <button type="button"
-                    onclick="toggleNotifications(event)"
-                    id="notification-button"
-                    style="/* your existing styles */">
-                Enable Notifications
-            </button>
+
             <!-- In your footer section where the notification button is -->
-{#            {% if user.is_authenticated and user.profile.pushnoti %}#}
-{#                <button id="notification-button">Disable Notifications</button>#}
-{#            {% elif user.is_authenticated %}#}
-{#                <button id="notification-button">Enable Notifications</button>#}
-{#            {% else %}#}
-{#                <p>You're not Logged In!</p>#}
-{#            {% endif %}#}
+            {% if user.is_authenticated %}
+                <button onclick="toggleNotifications()"
+                        id="notification-btn"
+                        class="{{ user.profile.pushnoti|yesno:'enabled,disabled' }}">
+                    {% if user.profile.pushnoti %}
+                        🔔 Disable Notifications
+                    {% else %}
+                        🔕 Enable Notifications
+                    {% endif %}
+                </button>
+            {% endif %}
 
             <div class="legal-links">
                 <a href="/privacy">Privacy Policy</a>
@@ -557,21 +556,27 @@
     }
 
     // Notification Control Functions
-    async function toggleNotifications(event) {
-        event.preventDefault();
-        const button = document.getElementById('notification-button');
-        button.disabled = true;
-
-        try {
-            if (button.textContent.includes('Enable')) {
-                await enableNotifications();
-            } else {
-                await disableNotifications();
+    async function toggleNotifications() {
+    const btn = document.getElementById('notification-btn');
+    try {
+        const response = await fetch('/toggle-notifications/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
             }
-        } finally {
-            button.disabled = false;
+        });
+
+        const data = await response.json();
+        if(data.status === 'success') {
+            btn.textContent = data.pushnoti ? '🔔 Disable' : '🔕 Enable';
+            btn.classList.toggle('enabled', data.pushnoti);
+            btn.classList.toggle('disabled', !data.pushnoti);
         }
+    } catch(error) {
+        console.error('Toggle failed:', error);
     }
+}
 
     async function enableNotifications() {
         const permission = await Notification.requestPermission();
