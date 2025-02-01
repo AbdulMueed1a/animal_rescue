@@ -34,6 +34,7 @@ class submission(models.Model):
 
 
 
+
 class FCMToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=255, unique=True)

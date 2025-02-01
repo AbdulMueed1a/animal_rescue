@@ -1,15 +1,19 @@
 import json
+
+from django.views.decorators.http import require_POST
+from user.models import Profile
 from .firebase import initialize_firebase
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import submission
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from .models import FCMToken
 
 # Create your views here.
+@login_required(login_url='/login/')
 def form(request):
     try:
         initialize_firebase()
@@ -18,6 +22,10 @@ def form(request):
     return render(request,'form.html')
 
 def index(request):
+    if request.user.is_authenticated:
+
+        wants_email = request.user.profile.mailnoti
+        wants_push = request.user.profile.pushnoti
     return render(request, 'index.html')
 
 def aboutus(request):
@@ -58,6 +66,16 @@ def reverse_geocode(lat, lon, city=False):
         print("Error during reverse geocoding:", e)
         return "Unknown" if city else "Address not found"
 
+@require_POST
+@login_required
+def delete_fcm_token(request):
+    try:
+        user = request.user
+        FCMToken.objects.filter(user=user).delete()
+        return JsonResponse({'status': 'success', 'message': 'Notifications disabled'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
 @csrf_exempt
 def save_fcm_token(request):
     if request.method == 'POST':
@@ -74,24 +92,21 @@ def save_fcm_token(request):
 
 
 @csrf_exempt
+@require_POST
 @login_required
 def update_fcm_token(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            new_token = data.get("token")
+    try:
+        user = request.user
+        new_token = request.POST.get('token')
 
-            if not new_token:
-                return JsonResponse({"error": "No token provided"}, status=400)
-
-            # Update or create the token
-            FCMToken.objects.update_or_create(user=request.user, defaults={"token": new_token})
-
-            return JsonResponse({"message": "FCM token updated successfully"})
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
+        # Update or create the FCM token
+        FCMToken.objects.update_or_create(
+            user=user,
+            defaults={'token': new_token}
+        )
+        return JsonResponse({'status': 'success', 'message': 'Token updated'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 def push_noti(self):
     import random
@@ -196,29 +211,41 @@ def my_reports(request):
 
 @login_required(login_url='/login/')
 def emergency_report_list(request):
-    # if request.user.is_authenticated and request.user.is_superuser:
+    if request.user.is_superuser or request.user.groups.filter(name='supervisor').exists():
         reports = submission.objects.all()
         return render(request, 'sup_reports.html', {'reports': reports.order_by("-id")})
-    # elif request.user.is_authenticated and not request.user.is_superuser:
-    #     return HttpResponseForbidden()
+    else:
+        return HttpResponseForbidden()
 
 
 login_required(login_url='/login/')
 def update_status(request, report_id):
-    if request.method == "POST":
-        report = get_object_or_404(submission, id=report_id)
-        report.status = request.POST.get('status')
-        report.save()
-    return redirect('emergency_report_list')
+    if request.user.is_superuser or request.user.groups.filter(name='supervisor').exists():
+        if request.method == "POST":
+            report = get_object_or_404(submission, id=report_id)
+            report.status = request.POST.get('status')
+            report.save()
+        return redirect('emergency_report_list')
+    else:
+        return HttpResponseForbidden()
 
 login_required(login_url='/login/')
 def delete_report(request, report_id):
-    if request.method == "POST":
-        report = get_object_or_404(submission, id=report_id)
-        report.delete()
-    return redirect('emergency_report_list')
+    if request.user.is_superuser or request.user.groups.filter(name='supervisor').exists():
+        if request.method == "POST":
+            report = get_object_or_404(submission, id=report_id)
+            report.delete()
+        return redirect('emergency_report_list')
+    else:
+        return HttpResponseForbidden()
 
 login_required(login_url='/login/')
 def reportdetails(request, report_id):
     report = get_object_or_404(submission, id=report_id)
     return render(request, 'reportdetails.html', {'report': report})
+
+def Mailnoti_en(request):
+    if request.method == "POST":
+        noti = get_object_or_404(User, username=request.user.username)
+        noti.emailnoti = True
+    return redirect('emergency_report_list')

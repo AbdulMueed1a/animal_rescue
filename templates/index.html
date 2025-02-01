@@ -386,8 +386,28 @@
         <div class="menu-toggle">☰</div>
         <div class="nav-links">
             <a href="#home">Home</a>
-            <a href="#mission">Mission</a>
-            <a href="#work">How It Works</a>
+            {% if user.is_superuser %}
+                <a href="/admin/">Admin Page</a>
+            {% else %}
+                <a href="#mission">Mission</a>
+            {% endif %}
+
+            {% with user.groups.all as groups %}
+                {% if user.is_superuser %}
+                    <a href="/reports/">Monitor Reports</a>
+                {% else %}
+                    {% for group in groups %}
+                        {% if group.name == "supervisor" %}
+                            <a href="/reports/">Monitor Reports</a>
+                            {% with found=1 %}{% endwith %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if not found %}
+                        <a href="#work">How It Works</a>
+                    {% endif %}
+                {% endif %}
+            {% endwith %}
+
             <a href="#aboutus">About Us</a>
             {% if user.is_authenticated %}
                 <a type="button"  href="/dashboard/" id="dasboard">Dashboard</a>
@@ -482,23 +502,20 @@
                 <p>• No copyright infringement intended. Images are used for informational, illustrative and education
                     purposes only.</p>
             </div>
-            {% if user.is_authenticated and user.fcm%}
-                 <form id="webpush-subscribe-form">
-                    <button type="button" onclick="requestNotificationPermission(event)" style="display: inline-block;
-                        padding: 10px 20px;
-                        background-color: #ffb727;
-                        color: #fff;
-                        border: none;
-                        border-radius: 5px;
-                        font-size: 1rem;
-                        cursor: pointer;
-                        margin-top: 10px;
-                        transition: background-color 0.3s ease;
-                    }">Enable Notifications</button>
-                </form>
-            {% else %}
-                <p>You are not logged in.</p>
-            {% endif %}
+            <button type="button"
+                    onclick="toggleNotifications(event)"
+                    id="notification-button"
+                    style="/* your existing styles */">
+                Enable Notifications
+            </button>
+            <!-- In your footer section where the notification button is -->
+{#            {% if user.is_authenticated and user.profile.pushnoti %}#}
+{#                <button id="notification-button">Disable Notifications</button>#}
+{#            {% elif user.is_authenticated %}#}
+{#                <button id="notification-button">Enable Notifications</button>#}
+{#            {% else %}#}
+{#                <p>You're not Logged In!</p>#}
+{#            {% endif %}#}
 
             <div class="legal-links">
                 <a href="/privacy">Privacy Policy</a>
@@ -514,54 +531,115 @@
         </div>
     </footer>
      <script>
-        // Firebase configuration
-        const firebaseConfig = {
-          apiKey: "AIzaSyA80SmOpP14bbtiVj2OA363_Cp8Hm0_W50",
-          authDomain: "animal-rescue-portal.firebaseapp.com",
-          projectId: "animal-rescue-portal",
-          storageBucket: "animal-rescue-portal.firebasestorage.app",
-          messagingSenderId: "833958160499",
-          appId: "1:833958160499:web:3e651a4a2bbf1f76692206",
-          measurementId: "G-4DDP7997KY"
-        };
+    // Firebase configuration and initialization
+    const firebaseConfig = {
+        apiKey: "AIzaSyA80SmOpP14bbtiVj2OA363_Cp8Hm0_W50",
+        authDomain: "animal-rescue-portal.firebaseapp.com",
+        projectId: "animal-rescue-portal",
+        storageBucket: "animal-rescue-portal.firebasestorage.app",
+        messagingSenderId: "833958160499",
+        appId: "1:833958160499:web:3e651a4a2bbf1f76692206",
+        measurementId: "G-4DDP7997KY"
+    };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const messaging = firebase.messaging();
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
 
-        if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/static/firebase-messaging-sw.js')
-        .then(registration => {
-          console.log('Service Worker registered:', registration);
-        })
-        .catch(error => {
-          console.error('Service Worker registration failed:', error);
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/firebase-messaging-sw.js')
+            .then(registration => {
+                console.log('Service Worker registered:', registration);
+            })
+            .catch(error => {
+                console.error('Service Worker registration failed:', error);
+            });
+    }
+
+    // Notification Control Functions
+    async function toggleNotifications(event) {
+        event.preventDefault();
+        const button = document.getElementById('notification-button');
+        button.disabled = true;
+
+        try {
+            if (button.textContent.includes('Enable')) {
+                await enableNotifications();
+            } else {
+                await disableNotifications();
+            }
+        } finally {
+            button.disabled = false;
+        }
+    }
+
+    async function enableNotifications() {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            const token = await messaging.getToken({
+                vapidKey: 'BNmjhTKr3tR05Ct4P3EGqdxown9waj1HOPOTm2DrpTuSHc7Vi2m9bRamZ7hXZfE92gtQFmto8BIqcfj1hEWRmFo'
+            });
+
+            if (token) {
+                await saveTokenToBackend(token);
+                updateButtonState(true);
+                localStorage.setItem('fcmToken', token);
+            }
+        }
+    }
+
+    async function disableNotifications() {
+        const token = await messaging.getToken();
+        if (token) {
+            await messaging.deleteToken(token);
+            await deleteTokenFromBackend(token);
+        }
+        localStorage.removeItem('fcmToken');
+        updateButtonState(false);
+    }
+
+    // Backend Communication
+    async function saveTokenToBackend(token) {
+        await fetch('/save-fcm-token/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ token })
         });
     }
 
-        function requestNotificationPermission(event) {
-          event.preventDefault();
-          Notification.requestPermission().then((permission) => {
-            if (permission === 'granted') {
-              messaging.getToken({ vapidKey: 'BNmjhTKr3tR05Ct4P3EGqdxown9waj1HOPOTm2DrpTuSHc7Vi2m9bRamZ7hXZfE92gtQFmto8BIqcfj1hEWRmFo' })
-                .then((currentToken) => {
-                  if (currentToken) {
-                    console.log('FCM Token:', currentToken);
-                    fetch('/save-fcm-token/', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                      },
-                      body: JSON.stringify({ token: currentToken })
-                    });
-                  }
-                })
-                .catch(console.error);
-            }
-          });
-        }
-      </script>
+    async function deleteTokenFromBackend(token) {
+        await fetch('/delete-fcm-token/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ token })
+        });
+    }
+
+    // UI Updates
+    function updateButtonState(isEnabled) {
+        const button = document.getElementById('notification-button');
+        button.textContent = isEnabled ? 'Disable Notifications' : 'Enable Notifications';
+        button.style.backgroundColor = isEnabled ? '#ff4444' : '#ffb727';
+    }
+
+    // Initial State Check
+    function initializeNotificationState() {
+        const storedToken = localStorage.getItem('fcmToken');
+        updateButtonState(!!storedToken);
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initializeNotificationState);
+
+    // Rest of your existing animations and other code...
+</script>
+</script>
     <script>
         // Mobile menu toggle
         const menuToggle = document.querySelector('.menu-toggle');

@@ -1,8 +1,7 @@
-# rescueform/utils.py
-from django.contrib.auth import get_user_model
-from django.apps import apps
-from firebase_admin import messaging
-from .models import FCMToken
+# utils.py
+from firebase_admin import messaging, exceptions
+
+from rescueform.models import FCMToken
 
 
 def send_fcm_notification(user, title, body, url=None):
@@ -13,12 +12,18 @@ def send_fcm_notification(user, title, body, url=None):
 
         # Validate token first
         try:
+            # Test if token is valid
             messaging.send(
                 messaging.Message(token=token),
                 dry_run=True
             )
-        except Exception as e:
+        except exceptions.UnregisteredError:
+            # Token is invalid, delete it and return
             print(f"❌ Invalid token for user {user}, deleting...")
+            fcm_token.delete()
+            return False
+        except exceptions.InvalidArgumentError:
+            print(f"❌ Invalid token format for user {user}, deleting...")
             fcm_token.delete()
             return False
 
@@ -41,5 +46,5 @@ def send_fcm_notification(user, title, body, url=None):
         print(f"❌ No FCM token found for user {user}")
         return False
     except Exception as e:
-        print(f"🚨 Error: {str(e)}")
+        print(f"🚨 Unexpected error: {str(e)}")
         return False

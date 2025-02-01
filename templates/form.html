@@ -244,29 +244,40 @@
         </form>
     </div>
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js";
+  // In your main app script
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js";
 import {
   getMessaging,
-  onMessage,
   getToken,
-  onTokenChanged  // <-- THIS IS THE CORRECT IMPORT
+  onMessage,
+  onTokenChanged
 } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA80SmOpP14bbtiVj2OA363_Cp8Hm0_W50",
-    authDomain: "animal-rescue-portal.firebaseapp.com",
-    projectId: "animal-rescue-portal",
-    storageBucket: "animal-rescue-portal.firebasestorage.app",
-    messagingSenderId: "833958160499",
-    appId: "1:833958160499:web:3e651a4a2bbf1f76692206",
-    measurementId: "G-4DDP7997KY"
-  };
-
-  // Initialize Firebase
+// Initialize Firebase
+const firebaseConfig = { /* your config */ };
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
-// Get current service worker registration
+// Configure token auto-refresh
+const handleTokenUpdate = async (newToken) => {
+  try {
+    const response = await fetch('/update-fcm-token/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: JSON.stringify({ token: newToken })
+    });
+
+    if (!response.ok) throw new Error('Token update failed');
+    console.log('Token updated on server');
+  } catch (error) {
+    console.error('Token sync error:', error);
+  }
+};
+
+// Initialize service worker and token
 navigator.serviceWorker.register('/firebase-messaging-sw.js')
   .then(async (registration) => {
     // Get initial token
@@ -274,22 +285,23 @@ navigator.serviceWorker.register('/firebase-messaging-sw.js')
       vapidKey: "BNmjhTKr3tR05Ct4P3EGqdxown9waj1HOPOTm2DrpTuSHc7Vi2m9bRamZ7hXZfE92gtQFmto8BIqcfj1hEWRmFo",
       serviceWorkerRegistration: registration
     });
-    console.log('Initial Token:', token);
+    if (token) await handleTokenUpdate(token);
 
     // Listen for token changes
-    onTokenChanged(messaging, (newToken) => {  // <-- CORRECT USAGE
+    onTokenChanged(messaging, async (newToken) => {
       if (newToken) {
-        console.log('New Token:', newToken);
-        // Update backend here
+        console.log('New FCM token:', newToken);
+        await handleTokenUpdate(newToken);
       }
     });
   });
 
 // Handle foreground messages
 onMessage(messaging, (payload) => {
-  console.log('Message received:', payload);
+  console.log('Received message:', payload);
   new Notification(payload.notification.title, {
-    body: payload.notification.body
+    body: payload.notification.body,
+    data: payload.data
   });
 });
 </script>

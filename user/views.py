@@ -1,6 +1,9 @@
 import os
 
-import environ
+from django.db.models.signals import post_save
+
+from .models import Profile
+from django.dispatch import receiver
 import random
 import smtplib
 import string
@@ -20,6 +23,14 @@ def generate_otp(length=6):
     otp = ''.join(random.choice(characters) for _ in range(length))
     return otp
 
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
 
 def send_email(note,recipient_email):
     smtp_server = "smtp.gmail.com"  # Example: Gmail SMTP server
@@ -121,6 +132,9 @@ def otp(request):
 
 
 def login(request):
+    if request.user.is_authenticated:
+        wants_email = request.user.profile.mailnoti
+        wants_push = request.user.profile.pushnoti
     if request.method == 'POST':
         username = request.POST['Email_username']
         password = request.POST['password']
