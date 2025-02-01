@@ -145,53 +145,103 @@
 <body>
     <div class="box">
         <div class="form">
-            <h1>Sign Up</h1>
-            <form method="post" action="signup">
-                {% csrf_token %}
-                <div>
-                    {% for message in messages %}
-                    <p>{{ message }}</p>
-                    {% endfor %}
-                </div>
-                <div class="inputbox">
-                    <label for="first_name">First Name</label>
-                    <input type="text" id="first_name" name="first_name" required>
-                </div>
-                <div class="inputbox">
-                    <label for="last_name">Last Name</label>
-                    <input type="text" id="last_name" name="last_name" required>
-                </div>
-                <div class="inputbox">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-                <div class="inputbox">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="inputbox">
-                    <label for="password1">Password</label>
-                    <input type="password" id="password1" name="password1" required>
-                    <div class="password-strength">
-                        <div class="password-strength-bar" id="password-strength-bar"></div>
-                    </div>
-                    <div class="password-strength-text" id="password-strength-text"></div>
-                </div>
-                <div class="inputbox">
-                    <label for="password2">Confirm Password</label>
-                    <input type="password" id="password2" name="password2" required>
-                </div>
-                <p>Send push notifications?: <input type="checkbox" name="pushnoti"><br>
-                Send mail notifications?: <input type="checkbox" name="mailnoti"><br>
-                </p>
-                <h6>Already have an account? <a href="login">Login</a></h6>
-                <input type="submit" value="Submit" class="sub" id="submit">
-            </form>
+    <h1>Sign Up</h1>
+    <form method="post" action="{% url 'signup' %}">
+        {% csrf_token %}
+        <div class="messages">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
         </div>
+        <div class="inputbox">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" required>
+        </div>
+        <div class="inputbox">
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" required>
+        </div>
+        <div class="inputbox">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="inputbox">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="inputbox">
+            <label for="password1">Password</label>
+            <input type="password" id="password1" name="password1" required>
+            <div class="password-strength">
+                <div class="password-strength-bar" id="password-strength-bar"></div>
+            </div>
+            <div class="password-strength-text" id="password-strength-text"></div>
+        </div>
+        <div class="inputbox">
+            <label for="password2">Confirm Password</label>
+            <input type="password" id="password2" name="password2" required>
+        </div>
+        <p>
+            Send push notifications?:
+            <input type="checkbox" name="pushnoti" value="true"><br>
+            Send mail notifications?:
+            <input type="checkbox" name="mailnoti" value="true"><br>
+        </p>
+        <input type="hidden" id="fcm_token" name="fcm_token">
+
+        <h6>Already have an account? <a href="{% url 'login' %}">Login</a></h6>
+        <input type="submit" value="Submit" class="sub" id="submit">
+    </form>
+</div>
+
     </div>
     <div class="box2">
         <img src="{% static 'images/character.png' %}" alt="" class="image1">
     </div>
+<script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyA80SmOpP14bbtiVj2OA363_Cp8Hm0_W50",
+        authDomain: "animal-rescue-portal.firebaseapp.com",
+        projectId: "animal-rescue-portal",
+        storageBucket: "animal-rescue-portal.firebasestorage.app",
+        messagingSenderId: "833958160499",
+        appId: "1:833958160499:web:3e651a4a2bbf1f76692206",
+        measurementId: "G-4DDP7997KY"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+
+    // Function to get FCM token
+    async function requestFCMToken() {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            const token = await messaging.getToken({
+                vapidKey: 'BNmjhTKr3tR05Ct4P3EGqdxown9waj1HOPOTm2DrpTuSHc7Vi2m9bRamZ7hXZfE92gtQFmto8BIqcfj1hEWRmFo'
+            });
+
+            if (token) {
+                document.getElementById('fcm_token').value = token;
+                console.log("FCM Token Generated:", token);
+            }
+        }
+    }
+
+    // Auto-request FCM token if push notifications checkbox is checked
+    document.addEventListener("DOMContentLoaded", function () {
+        const pushCheckbox = document.querySelector("input[name='pushnoti']");
+        pushCheckbox.addEventListener("change", function () {
+            if (this.checked) {
+                requestFCMToken();
+            } else {
+                document.getElementById('fcm_token').value = '';
+            }
+        });
+    });
+</script>
+
 
     <script>
         const passwordInput = document.getElementById('password1');

@@ -1,4 +1,8 @@
 import json
+import random
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from django.views.decorators.http import require_POST
 from user.models import Profile
@@ -11,6 +15,7 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from .models import FCMToken
+from credentials import logindetails
 
 # Create your views here.
 @login_required(login_url='/user/login/')
@@ -79,7 +84,6 @@ def reverse_geocode(lat, lon, city=False):
         return data.get("display_name", "Address not found")
 
     except requests.RequestException as e:
-        print("Error during reverse geocoding:", e)
         return "Unknown" if city else "Address not found"
 
 @require_POST
@@ -129,9 +133,84 @@ def update_fcm_token(request):
         return JsonResponse({'status': 'success', 'message': 'Token updated'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+def mail_noti(self):
+
+
+    titles = [
+        "🐾 A Little Friend Needs Help! 🐾",
+        "🚨 Emergency: Animal in Distress! 🚨",
+        "❤️🩹 A Furry Friend Needs You! ❤️🩹",
+        "🐾 Help a Soul in Need! 🐾",
+        "⚠️ Urgent: Animal Rescue Needed! ⚠️",
+        "🐾 A Life is Waiting for You! 🐾",
+        "❤️ A Precious Creature Needs Aid! ❤️",
+        "🐾 Can You Be Their Hero? 🐾",
+        "🚨 Quick! An Animal Needs Rescue! 🚨",
+        "🐾 A Little Paw Needs Your Help! 🐾"
+    ]
+    bodies = [
+        f"{random.choice(['😢', '🩹', '❤️🩹'])} {self.username} spotted an injured {self.animal  or 'animal'} nearby! "
+        f"Can you check the details? Every minute matters...",
+        f"A little {self.animal or 'creature'} is in trouble near {self.address}. "
+        f"{random.choice(['Please lend a hand!', 'Your help could save a life!'])}",
+        f"🚨 Emergency! A {self.animal  or 'helpless animal'} needs immediate assistance at {self.address}. "
+        f"{random.choice(['Can you help?', 'Your kindness could save them!'])}",
+        f"❤️ A {self.animal  or 'sweet soul'} is in pain near {self.address}. "
+        f"{random.choice(['Can you be their hero?', 'Your action could make all the difference!'])}",
+        f"🐾 A {self.animal  or 'little friend'} is hurt and needs your help at {self.address}. "
+        f"{random.choice(['Please act quickly!', 'Every second counts!'])}",
+        f"⚠️ Urgent! A {self.animal  or 'vulnerable animal'} needs rescue at {self.address}. "
+        f"{random.choice(['Can you assist?', 'Your help could save a life!'])}",
+        f"😢 A {self.animal  or 'poor creature'} is suffering near {self.address}. "
+        f"{random.choice(['Can you lend a hand?', 'Your kindness could save them!'])}",
+        f"🐾 A {self.animal  or 'little paw'} needs your help at {self.address}. "
+        f"{random.choice(['Please act now!', 'Your action could save a life!'])}",
+        f"❤️🩹 A {self.animal  or 'helpless animal'} is in distress near {self.address}. "
+        f"{random.choice(['Can you help?', 'Your kindness could save them!'])}",
+        f"🚨 Quick! A {self.animal  or 'little friend'} needs rescue at {self.address}. "
+        f"{random.choice(['Can you assist?', 'Your help could save a life!'])}"
+    ]
+
+    from django.contrib.auth.models import User
+
+    # Only send to users with FCM tokens
+    users_with_tokens = User.objects.filter(
+
+        profile__mailnoti=True
+    ).distinct()
+    for user in users_with_tokens:
+        user.profile.pushnoti=True
+        send_email(user.email, random.choice(titles), random.choice(bodies))
+
+
+def send_email(recipient_email,title,body):
+    smtp_server = "smtp.gmail.com"  # Example: Gmail SMTP server
+    smtp_port = 587  # Port for TLS
+    # sender_email = os.environ.get("EMAIL_HOST_USER")
+    # mail_pass = os.environ.get("EMAIL_HOST_PASSWORD")
+    sender_email = logindetails.sender_email
+    mail_pass = logindetails.sender_password
+    sub = title
+    body = body
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = recipient_email
+    message["Subject"] = sub
+    message.attach(MIMEText(body, "plain"))  # Attach the plain-text body to the message
+
+    try:
+        # Connect to the SMTP server
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()  # Secure the connection
+            server.login(sender_email, mail_pass)  # Log in to the server
+            server.send_message(message)  # Send the email
+            print("Email sent successfully!")
+
+    except Exception as e:
+        print(f"Error: {e}")
 
 def push_noti(self):
-    import random
+
     from .utils import send_fcm_notification
     titles = [
         "🐾 A Little Friend Needs Help! 🐾",
@@ -176,7 +255,7 @@ def push_noti(self):
         profile__pushnoti=True
     ).distinct()
     for user in users_with_tokens:
-        user.profile.pushnoti=True
+
         send_fcm_notification(
             user=user,
             title=random.choice(titles),

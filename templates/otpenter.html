@@ -99,8 +99,8 @@
     <div class="container">
         <div class="box">
             <h1>OTP Verification</h1>
-            {% for mess %}
-            <form method="post" action="otp">
+
+            <form method="post" action="{% url 'otp' %}">
                 {% csrf_token %}
                 {% if messages %}
                     <div class="messages">

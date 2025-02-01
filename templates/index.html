@@ -509,9 +509,20 @@
                         id="notification-btn"
                         class="{{ user.profile.pushnoti|yesno:'enabled,disabled' }}">
                     {% if user.profile.pushnoti %}
-                        🔔 Disable Notifications
+                        🔔 Disable Push-Notifications
                     {% else %}
-                        🔕 Enable Notifications
+                        🔕 Enable Push-Notifications
+                    {% endif %}
+                </button>
+            {% endif %}
+                {% if user.is_authenticated %}
+                <button onclick="toggleNotifications()"
+                        id="notification-btn"
+                        class="{{ user.profile.pushnoti|yesno:'enabled,disabled' }}">
+                    {% if user.profile.pushnoti %}
+                        🔔 Disable Mail-Notifications
+                    {% else %}
+                        🔕 Enable Mail-Notifications
                     {% endif %}
                 </button>
             {% endif %}

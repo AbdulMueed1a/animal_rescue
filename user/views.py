@@ -3,6 +3,7 @@ import os
 from django.db.models.signals import post_save
 
 from .models import Profile
+from rescueform.models import FCMToken
 from django.dispatch import receiver
 import random
 import smtplib
@@ -65,30 +66,34 @@ def send_email(note,recipient_email):
     except Exception as e:
         print(f"Error: {e}")
 
-
 def register(request):
     if request.method == 'POST':
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        email = request.POST['email']
+        # Use .get() to avoid MultiValueDictKeyError
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        username = request.POST.get('username', '').strip()
+        password1 = request.POST.get('password1', '')
+        password2 = request.POST.get('password2', '')
+        mnoti = request.POST.get('mailnoti', 'false')  # checkboxes might not be in POST if unchecked
+        pnoti = request.POST.get('pushnoti', 'false')
+
+        # Optionally, check if required fields are provided:
+        if not first_name or not last_name or not email or not username:
+            messages.error(request, "All fields are required!")
+            return redirect('signup')
+
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already registered')
             return redirect('signup')
 
-        password1 = request.POST['password1']
-        password2 = request.POST['password2']
         if password1 != password2:
             messages.error(request, 'Passwords do not match')
             return redirect('signup')
 
-        username = request.POST['username']
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Username already registered')
             return redirect('signup')
-
-        mnoti=request.POST['mailnoti']
-        pnoti=request.POST['pushnoti']
-
 
         # Generate OTP and send email
         otp = generate_otp()
@@ -109,10 +114,9 @@ def register(request):
 
     return render(request, "signup.html")
 
-
 def otp(request):
     if request.method == 'POST':
-        entered_otp = request.POST['otp']
+        entered_otp = request.POST.get('otp', '').strip()
         user_data = request.session.get('user_data')
 
         if not user_data:
@@ -121,23 +125,41 @@ def otp(request):
 
         if entered_otp == user_data['otp']:
             # OTP is correct, create the user
-            user = Profile.objects.create_user(
+            user = User.objects.create_user(
                 username=user_data['username'],
                 email=user_data['email'],
                 password=user_data['password'],
                 first_name=user_data['first_name'],
-                last_name=user_data['last_name'],
-                mailNoti=user_data['mailnoti'],
-                pushnoti=user_data['pushnoti']
+                last_name=user_data['last_name']
             )
+
+            # Convert checkbox string values to booleans
+            mail_noti_bool = user_data.get('mailnoti', '').lower() in ['true', 'on']
+            push_noti_bool = user_data.get('pushnoti', '').lower() in ['true', 'on']
+
+            # Retrieve FCM token
+            fcm_token = request.POST.get('fcm_token', '')
+
+            # Store notification preferences in the profile (if applicable)
+            profile = user.profile
+            profile.mailnoti = mail_noti_bool
+            profile.pushnoti = push_noti_bool
+            profile.save()
+
+            # Save FCM token only if push notifications are enabled
+            if push_noti_bool and fcm_token:
+                FCMToken.objects.create(user=user, token=fcm_token)
+
             messages.success(request, 'Registration successful!')
             del request.session['user_data']  # Clear session data
-            return redirect('login')  # Redirect to login or desired page
+            return redirect('login')
+
         else:
             messages.error(request, 'Incorrect OTP. Please try again.')
             return redirect('otp')
 
     return render(request, "otpenter.html")
+
 
 
 def login(request):
