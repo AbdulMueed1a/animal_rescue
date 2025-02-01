@@ -1,130 +1,152 @@
 {% load static %}
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Page</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        .container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .image-section {
-            width: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f0f0f0;
-        }
-
-        .image-section img {
-            width: 75%;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .details-section {
-            width: 50%;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .about_report {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .product-description {
-            font-size: 16px;
-            color: #555;
-        }
-
-        .card {
-            min-width: 150px;
-            cursor: pointer;
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .card img {
-            width: 100%;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                gap: 20px;
-
-            }
-
-            .image-section,
-            .details-section {
-                width: 100%;
-            }
-
-            .card {
-                min-width: 120px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Page</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Main container holds two columns */
+    .container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    /* Left column for map & image */
+    .left-column {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    /* Map section styles */
+    .map-section {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #map {
+      width: 100%;
+      max-width: 600px;
+      height: 250px;
+      margin: auto;
+      border-radius: 1rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    /* Image section styles */
+    .image-section {
+      width: 100%;
+      text-align: center;
+    }
+    .image-section img {
+      width: 80%;
+      max-width: 600px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    /* Right column for details text */
+    .details-section {
+      width: 50%;
+      overflow-y: auto;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .about_report {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .product-description {
+      font-size: 16px;
+      color: #555;
+    }
+    /* Responsive styles: stack columns vertically on small screens */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      .left-column,
+      .details-section {
+        width: 100%;
+      }
+      #map, .image-section img {
+        width: 90%;
+      }
+    }
+  </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="image-section">
-            <img id="product-image" src="{{ report.image.url }}" alt="Product">
+  <div class="container">
+    <div class="left-column">
+      {% if report.latitude != 0.0 and report.longitude != 0.0 %}
+        <div class="map-section">
+          <h2 style="color: var(--primary); margin-bottom: 1rem;">🗺️ Incident Map</h2>
+          <div id="map"></div>
         </div>
-        <div class="details-section">
-            <h1 id="about-report" class="about_report">About Report</h1>
-            <!-- Contact Number -->
-            <h3>Contact Number</h3>
-            <p id="contect-no" class="contect-no">{{ report.contact }}</p>
-            <!-- Reporter Emial -->
-            <h3>Reporter Email</h3>
-            <p id="reporter-email" class="reporter-email">{{ report.email }}</p>
-            <!-- Select a date (optional): -->
-            <h3>Report Date</h3>
-            <p id="report-date" class="report-date">{{ report.date }}</p>
-            <!-- City: -->
-            <h3>City</h3>
-            <p id="city" class="city">{{ report.city }}</p>
-            <!-- Location: -->
-            <h3>Address</h3>
-            <p id="address" class="address">{{ report.address }}</p>
-            <!-- What Animal -->
-            <h3>Animal Kind</h3>
-            <p id="animal-kind" class="animal-kind">{{ report.animal }}</p>
-            <!-- Condition of the Animal: -->
-            <h3>Animal Condition</h3>
-            <p id="condition" class="condition">{{ report.condition }}</p>
-            <!-- Description: -->
-            <h3>Other Details</h3>
-            <p id="product-description" class="product-description">{{ report.discription }}</p>
-        </div>
+      {% endif %}
+      <div class="image-section">
+        <img id="product-image" src="{{ report.image.url }}" alt="Product">
+      </div>
     </div>
+    <div class="details-section">
+      <h1 id="about-report" class="about_report">About Report</h1>
+      <h3>Contact Number</h3>
+      <p id="contect-no" class="contect-no">{{ report.contact }}</p>
+      <h3>Reporter Email</h3>
+      <p id="reporter-email" class="reporter-email">{{ report.email }}</p>
+      <h3>Report Date</h3>
+      <p id="report-date" class="report-date">{{ report.date }}</p>
+      <h3>City</h3>
+      <p id="city" class="city">{{ report.city }}</p>
+      <h3>Address</h3>
+      <p id="address" class="address">{{ report.address }}</p>
+      <h3>Animal Kind</h3>
+      <p id="animal-kind" class="animal-kind">{{ report.animal }}</p>
+      <h3>Animal Condition</h3>
+      <p id="condition" class="condition">{{ report.condition }}</p>
+      <h3>Other Details</h3>
+      <p id="product-description" class="product-description">{{ report.discription }}</p>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    {% if report.latitude != 0.0 and report.longitude != 0.0 %}
+      // Initialize the map with a closer zoom level
+      const map = L.map('map', { zoomControl: false })
+                   .setView([{{ report.latitude }}, {{ report.longitude }}], 14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+      L.marker([{{ report.latitude }}, {{ report.longitude }}])
+        .addTo(map)
+        .bindPopup(`
+          <div style="min-width: 200px">
+            <strong>{{ report.city }}</strong><br>
+            {{ report.address }}<br>
+            Status: {{ report.condition }}
+          </div>
+        `);
+    {% endif %}
+    window.addEventListener('resize', () => {
+      if (typeof map !== 'undefined') {
+        map.invalidateSize();
+      }
+    });
+  </script>
 </body>
-
 </html>
-
