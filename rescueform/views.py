@@ -8,6 +8,9 @@ from email.mime.text import MIMEText
 from django.views.decorators.http import require_POST
 
 from django.conf import settings
+import cloudinary.uploader
+
+from credentials import logindetails
 from user.models import Profile
 from .firebase import initialize_firebase
 import requests
@@ -276,74 +279,77 @@ def push_noti(self):
             url=f"/dashboard/{self.id}/"
         )
 
-def upload_image_to_imgur(image_file):
-    """
-    Upload an image file to Imgur and return the image URL.
-    """
-    url = "https://api.imgur.com/3/upload"
-    headers = {
-        "Authorization": f"Client-ID {settings.IMGUR_CLIENT_ID}",
-    }
-    # Use the 'files' parameter so that requests handles multipart encoding.
-    response = requests.post(url, headers=headers, files={"image": image_file})
-    if response.status_code == 200:
-        json_response = response.json()
-        if json_response.get("success"):
-            return json_response["data"]["link"]
-    return None
-
 @login_required(login_url='/user/login/')
 def rescue_submit(request):
-    subm = submission()
     if request.method == "POST":
-        user = User.objects.get(username=request.user.username)
-        subm.username = request.user.username
-        subm.name = user.first_name + " " + user.last_name
-        subm.email = user.email
-        subm.animal = request.POST['animal']
-        subm.contact = request.POST['contact']
-
-        # Upload the image to Imgur instead of (or in addition to) saving locally.
-        image_file = request.FILES.get('image')
-        if image_file:
-            imgur_url = upload_image_to_imgur(image_file)
-            if imgur_url:
-                subm.imgur_url = imgur_url
-            else:
-                # Optionally, handle upload failure (e.g., show an error message)
-                print("Imgur upload failed")
-
-        if request.POST.get('date'):
-            subm.date = request.POST['date']
-
-        radio = request.POST.get('location_type')
-        # It looks like you want to print the reverse geocode result.
-        print("Reverse geocode result:", reverse_geocode(subm.latitude, subm.longitude, city=True))
-
-        if radio == 'manual':
-            subm.city = request.POST['city'] if request.POST.get('city') else 'Unknown'
-            subm.address = request.POST['address']
-        elif radio == 'map':
-            subm.latitude = request.POST['latitude']
-            subm.longitude = request.POST['longitude']
-            subm.address = reverse_geocode(subm.latitude, subm.longitude)
-            subm.city = reverse_geocode(subm.latitude, subm.longitude, city=True)
-
-        # Ensure city is set
-        if not subm.city:
-            subm.city = 'Unknown'
-        print(subm.address)
-        subm.condition = request.POST['condition']
-        subm.description = request.POST['description']
-
-        subm.save()
-
         try:
-            push_noti(self=subm)
-        except Exception as e:
-            print(e)
+            subm = submission()
+            user = request.user  # Directly use the authenticated user
 
-        return redirect('/dashboard/')
+            # Basic user info
+            subm.username = user.username
+            subm.name = f"{user.first_name} {user.last_name}"
+            subm.email = user.email
+
+            # Animal and contact info
+            subm.animal = request.POST['animal']
+            subm.contact = request.POST['contact']
+
+            # Image handling with Cloudinary
+            # image_file = request.FILES.get('image')
+            subm.image = request.FILES.get('image')
+            # if image_file:
+            #     # Upload to Cloudinary with error handling
+            #     result = cloudinary.uploader.upload(
+            #         image_file,
+            #         folder="rescue_submissions/",
+            #         resource_type="image",
+            #         allowed_formats=['jpg', 'png', 'jpeg']
+            #     )
+            #     subm.image_url = result['secure_url']  # Store Cloudinary URL
+
+            # Date handling
+            if request.POST.get('date'):
+                subm.date = request.POST['date']
+
+            # Location handling
+            location_type = request.POST.get('location_type')
+            if location_type == 'manual':
+                subm.city = request.POST.get('city', 'Unknown')
+                subm.address = request.POST.get('address', '')
+            elif location_type == 'map':
+                subm.latitude = request.POST.get('latitude')
+                subm.longitude = request.POST.get('longitude')
+                try:
+                    subm.address = reverse_geocode(subm.latitude, subm.longitude)
+                    subm.city = reverse_geocode(subm.latitude, subm.longitude, city=True)
+                except Exception as geocode_error:
+                    print(f"Geocoding failed: {geocode_error}")
+                    subm.city = 'Unknown'
+
+            # Description and condition
+            subm.condition = request.POST.get('condition', '')
+            subm.description = request.POST.get('description', '')
+
+            # Save and send notifications
+            subm.save()
+
+            try:
+                push_noti(subm)  # Your existing notification function
+            except Exception as noti_error:
+                print(f"Notification failed: {noti_error}")
+
+            return redirect('/dashboard/')
+
+        except KeyError as ke:
+            print(f"Missing form field: {ke}")
+            return redirect('/error/missing-fields/')
+
+        except Exception as e:
+            print(f"Submission error: {e}")
+            return redirect('/error/generic/')
+
+    return redirect('/dashboard/')
 
 @login_required(login_url='/user/login/')
 def my_reports(request):
@@ -389,4 +395,9 @@ def reportdetails(request, report_id):
     report = get_object_or_404(submission, id=report_id)
     return render(request, 'reportdetails.html', {'report': report})
 
+def missing_fields_error(request):
+    return render(request, 'errors/missing_fields.html', status=400)
+
+def generic_error(request):
+    return render(request, 'errors/generic.html', status=500)
 

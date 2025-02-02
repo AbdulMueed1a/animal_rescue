@@ -2,6 +2,7 @@ import os
 
 from django.db.models.signals import post_save
 
+from credentials import logindetails
 from .models import Profile
 from rescueform.models import FCMToken
 from django.dispatch import receiver

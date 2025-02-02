@@ -1,6 +1,8 @@
 from _datetime import date
 from django.contrib.auth.models import User
 from django.db import models
+from cloudinary.models import CloudinaryField
+
 
 
 # Create your models here.
@@ -22,7 +24,7 @@ class submission(models.Model):
     animal = models.CharField(max_length=100)
     contact = models.CharField(max_length=100)
     date = models.DateField(default=date.today)
-    imgur_url = models.URLField(blank=True, null=True)
+    image = CloudinaryField('image', folder='rescue_requests/',null=True, blank=True,help_text='Upload animal situation photo')
     # image = models.ImageField(upload_to='images/')
     latitude = models.FloatField(default=0.0,null=True, blank=True)
     longitude = models.FloatField(default=0.0,null=True, blank=True)

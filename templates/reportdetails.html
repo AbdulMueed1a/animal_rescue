@@ -97,7 +97,7 @@
         </div>
       {% endif %}
       <div class="image-section">
-        <img id="product-image" src="{{ report.image_url }}" alt="Product">
+        <img id="product-image" src="{{ report.image.url }}" alt="Product">
       </div>
     </div>
     <div class="details-section">
@@ -117,7 +117,7 @@
       <h3>Animal Condition</h3>
       <p id="condition" class="condition">{{ report.condition }}</p>
       <h3>Other Details</h3>
-      <p id="product-description" class="product-description">{{ report.discription }}</p>
+      <p id="product-description" class="product-description">{{ report.description }}</p>
     </div>
   </div>
 

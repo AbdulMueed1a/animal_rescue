@@ -13,15 +13,16 @@ import os
 from pathlib import Path
 from credentials import logindetails
 import dj_database_url
-
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-IMGUR_CLIENT_ID = '5f16d8c411f1210'
-IMGUR_CLIENT_SECRET = '42cddf900e52c675cefa355601a7a17ff20da5fb'
+
 
 # env = environ.Env(
 #     DEBUG=(bool, False),python manage.py upload_static_images --folder=static/images
@@ -36,11 +37,10 @@ IMGUR_CLIENT_SECRET = '42cddf900e52c675cefa355601a7a17ff20da5fb'
 SECRET_KEY = os.environ.get("KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = "True"
-# DEBUG = os.environ.get("DEBUG","false").lower()=="true"
+# DEBUG = "True"
+DEBUG = os.environ.get("DEBUG","false").lower()=="true"
 
-ALLOWED_HOSTS = [".ngrok-free.app" , "127.0.0.1" ,"localhost"]
-# ALLOWED_HOSTS = [".vercel.app"]
+ALLOWED_HOSTS = [".ngrok-free.app" , "127.0.0.1" ,"localhost",".vercel.app"]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://c404-203-109-42-158.ngrok-free.app',  # Add your ngrok URL with HTTPS
@@ -55,6 +55,8 @@ SITE_ID = 1
 INSTALLED_APPS = [
     'rescueform.apps.RescueformConfig',
     'user.apps.UserConfig',
+    'cloudinary',
+    'cloudinary_storage',
     'Animalrescue_project.apps.AnimalreascueProjectConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -65,13 +67,38 @@ INSTALLED_APPS = [
     'django.contrib.sites'
 ]
 
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'your_cloud_name'),
+#     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', 'your_api_key'),
+#     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'your_api_secret')
+# }
 
+# cloudinary.config(
+#     cloud_name=logindetails.CLOUDINARY_CLOUD_NAME,
+#     api_key=logindetails.CLOUDINARY_API_KEY,
+#     api_secret=logindetails.CLOUDINARY_API_SECRET,
+# )
+
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret= os.environ.get('CLOUDINARY_API_SECRET'),
+)
+
+
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': logindetails.CLOUDINARY_CLOUD_NAME,
+#     'API_KEY': logindetails.CLOUDINARY_API_KEY,
+#     'API_SECRET': logindetails.CLOUDINARY_API_SECRET
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -155,6 +182,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 # Static files (CSS, JavaScript, Images)

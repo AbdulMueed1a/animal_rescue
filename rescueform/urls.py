@@ -18,5 +18,7 @@ urlpatterns = [
     path('toggle-notifications/', views.toggle_notifications, name='toggle_notifications'),
     path('toggle-mail-notifications/', views.toggle_mail_notifications, name='toggle-mail-notifications'),
     path('delete-fcm-token/', views.delete_fcm_token, name='delete_fcm_token'),
-    path('update-fcm-token/', views.update_fcm_token, name='update_fcm_token')
+    path('update-fcm-token/', views.update_fcm_token, name='update_fcm_token'),
+    path('error/missing-fields/', views.missing_fields_error, name='missing_fields'),
+    path('error/generic/', views.generic_error, name='generic_error')
 ]
