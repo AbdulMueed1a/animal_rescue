@@ -4,20 +4,13 @@ import random
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
 from django.views.decorators.http import require_POST
-
-from django.conf import settings
-import cloudinary.uploader
-
-from credentials import logindetails
 from user.models import Profile
 from .firebase import initialize_firebase
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import submission
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from .models import FCMToken
