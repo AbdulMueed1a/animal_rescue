@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+from credentials import logindetails
 import os
 from pathlib import Path
 import dj_database_url
@@ -32,12 +33,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = logindetails.key
-SECRET_KEY = os.environ.get("KEY")
+SECRET_KEY = logindetails.key
+# SECRET_KEY = os.environ.get("KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = "True"
-DEBUG = os.environ.get("DEBUG","false").lower()=="true"
+DEBUG = "True"
+# DEBUG = os.environ.get("DEBUG","false").lower()=="true"
 
 ALLOWED_HOSTS = [".ngrok-free.app" , "127.0.0.1" ,"localhost",".vercel.app"]
 
@@ -55,7 +56,6 @@ INSTALLED_APPS = [
     'rescueform.apps.RescueformConfig',
     'user.apps.UserConfig',
     'cloudinary',
-    'cloudinary_storage',
     'Animalrescue_project.apps.AnimalreascueProjectConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -66,23 +66,19 @@ INSTALLED_APPS = [
     'django.contrib.sites'
 ]
 
-# CLOUDINARY_STORAGE = {
-#     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'your_cloud_name'),
-#     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', 'your_api_key'),
-#     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'your_api_secret')
-# }
 
-# cloudinary.config(
-#     cloud_name=logindetails.CLOUDINARY_CLOUD_NAME,
-#     api_key=logindetails.CLOUDINARY_API_KEY,
-#     api_secret=logindetails.CLOUDINARY_API_SECRET,
-# )
 
 cloudinary.config(
-    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    api_key=os.environ.get('CLOUDINARY_API_KEY'),
-    api_secret= os.environ.get('CLOUDINARY_API_SECRET'),
+    cloud_name=logindetails.CLOUDINARY_CLOUD_NAME,
+    api_key=logindetails.CLOUDINARY_API_KEY,
+    api_secret=logindetails.CLOUDINARY_API_SECRET,
 )
+#
+# cloudinary.config(
+#     cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+#     api_key=os.environ.get('CLOUDINARY_API_KEY'),
+#     api_secret= os.environ.get('CLOUDINARY_API_SECRET'),
+# )
 
 
 # CLOUDINARY_STORAGE = {
@@ -142,12 +138,12 @@ WSGI_APPLICATION = 'DjangoProject3.wsgi.application'
 # 	}
 # }
 # database = DATABASES['default']=dj_database_url.parse(f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require")
-POSTGRES_DATABASE = dj_database_url.parse(
-    f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
-)
 # POSTGRES_DATABASE = dj_database_url.parse(
-#     f"postgresql://{logindetails.neonuser}:{logindetails.neonpassword}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
+#     f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
 # )
+POSTGRES_DATABASE = dj_database_url.parse(
+    f"postgresql://{logindetails.neonuser}:{logindetails.neonpassword}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
+)
 DATABASES = {'default': POSTGRES_DATABASE}
 
 
