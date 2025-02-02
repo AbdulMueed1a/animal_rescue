@@ -16,7 +16,6 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from .models import FCMToken
-from credentials import logindetails
 
 # Create your views here.
 @login_required(login_url='/user/login/')
