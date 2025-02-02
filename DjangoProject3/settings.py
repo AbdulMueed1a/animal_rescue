@@ -29,8 +29,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = logindetails.key
-# SECRET_KEY = os.environ.get("KEY")
+# SECRET_KEY = logindetails.key
+SECRET_KEY = os.environ.get("KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = "True"
@@ -113,12 +113,12 @@ WSGI_APPLICATION = 'DjangoProject3.wsgi.application'
 # 	}
 # }
 # database = DATABASES['default']=dj_database_url.parse(f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require")
-# POSTGRES_DATABASE = dj_database_url.parse(
-#     f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
-# )
 POSTGRES_DATABASE = dj_database_url.parse(
-    f"postgresql://{logindetails.neonuser}:{logindetails.neonpassword}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
+    f"postgresql://{os.environ.get('NEON_USER')}:{os.environ.get('NEON_PASS')}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
 )
+# POSTGRES_DATABASE = dj_database_url.parse(
+#     f"postgresql://{logindetails.neonuser}:{logindetails.neonpassword}@ep-divine-heart-a99g0qly-pooler.gwc.azure.neon.tech/animal_rescue?sslmode=require"
+# )
 DATABASES = {'default': POSTGRES_DATABASE}
 
 

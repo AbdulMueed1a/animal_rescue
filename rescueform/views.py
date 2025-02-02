@@ -1,4 +1,5 @@
 import json
+import os
 import random
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -197,10 +198,10 @@ def mail_noti(self):
 def send_email(recipient_email,title,body):
     smtp_server = "smtp.gmail.com"  # Example: Gmail SMTP server
     smtp_port = 587  # Port for TLS
-    # sender_email = os.environ.get("EMAIL_HOST_USER")
-    # mail_pass = os.environ.get("EMAIL_HOST_PASSWORD")
-    sender_email = logindetails.sender_email
-    mail_pass = logindetails.sender_password
+    sender_email = os.environ.get("EMAIL_HOST_USER")
+    mail_pass = os.environ.get("EMAIL_HOST_PASSWORD")
+    # sender_email = logindetails.sender_email
+    # mail_pass = logindetails.sender_password
     sub = title
     body = body
     message = MIMEMultipart()
