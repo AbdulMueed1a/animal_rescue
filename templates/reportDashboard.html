@@ -382,7 +382,7 @@
             <h2 style="color: var(--user-accent); margin-bottom: 1.5rem;">📋 Your Reports</h2>
             {% for subm in usersubm %}
             <div class="report-card user-report-card" onclick="window.location.href='./{{ subm.id }}'">
-                <img src="{{ subm.image.url }}" class="card-image" loading="lazy">
+                <img src="{{ subm.image_url }}" class="card-image" loading="lazy">
                 <div class="card-details">
                     <span class="status-badge">{{ subm.condition }}</span>
 
@@ -412,7 +412,7 @@
                 <h2 style="color: var(--global-accent); margin-bottom: 1.5rem;">🌍 Global Reports</h2>
                 {% for report in storedReports %}
                 <div class="report-card global-report-card" onclick="window.location.href='./{{ report.id }}'">
-                    <img src="{{ report.image.url }}" class="card-image" loading="lazy">
+                    <img src="{{ report.image_url }}" class="card-image" loading="lazy">
                     <div class="card-details">
                         <span class="status-badge">{{ report.condition }}</span>
 
@@ -447,7 +447,7 @@
             <h2 style="color: var(--user-accent); margin-bottom: 1.5rem;">📋 Your Reports</h2>
             {% for subm in usersubm %}
             <div class="report-card user-report-card" onclick="window.location.href='./{{ subm.id }}'">
-                <img src="{{ subm.image.url }}" class="card-image" loading="lazy">
+                <img src="{{ subm.image_url }}" class="card-image" loading="lazy">
                 <div class="card-details">
                     <span class="status-badge">{{ subm.condition }}</span>
 
@@ -472,7 +472,7 @@
             <h2 style="color: var(--global-accent); margin-bottom: 1.5rem;">🌍 Global Reports</h2>
             {% for report in storedReports %}
             <div class="report-card global-report-card" onclick="window.location.href='./{{report.id}}' ">
-                <img src="{{ report.image.url }}" class="card-image" loading="lazy">
+                <img src="{{ report.image_url }}" class="card-image" loading="lazy">
                 <div class="card-details">
                     <span class="status-badge">{{ report.condition }}</span>
 

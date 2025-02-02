@@ -6,6 +6,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from django.views.decorators.http import require_POST
+
+from django.conf import settings
 from user.models import Profile
 from .firebase import initialize_firebase
 import requests
@@ -274,6 +276,22 @@ def push_noti(self):
             url=f"/dashboard/{self.id}/"
         )
 
+def upload_image_to_imgur(image_file):
+    """
+    Upload an image file to Imgur and return the image URL.
+    """
+    url = "https://api.imgur.com/3/upload"
+    headers = {
+        "Authorization": f"Client-ID {settings.IMGUR_CLIENT_ID}",
+    }
+    # Use the 'files' parameter so that requests handles multipart encoding.
+    response = requests.post(url, headers=headers, files={"image": image_file})
+    if response.status_code == 200:
+        json_response = response.json()
+        if json_response.get("success"):
+            return json_response["data"]["link"]
+    return None
+
 @login_required(login_url='/user/login/')
 def rescue_submit(request):
     subm = submission()
@@ -284,11 +302,22 @@ def rescue_submit(request):
         subm.email = user.email
         subm.animal = request.POST['animal']
         subm.contact = request.POST['contact']
-        subm.image = request.FILES['image']
-        if request.POST['date']:
+
+        # Upload the image to Imgur instead of (or in addition to) saving locally.
+        image_file = request.FILES.get('image')
+        if image_file:
+            imgur_url = upload_image_to_imgur(image_file)
+            if imgur_url:
+                subm.imgur_url = imgur_url
+            else:
+                # Optionally, handle upload failure (e.g., show an error message)
+                print("Imgur upload failed")
+
+        if request.POST.get('date'):
             subm.date = request.POST['date']
 
         radio = request.POST.get('location_type')
+        # It looks like you want to print the reverse geocode result.
         print("Reverse geocode result:", reverse_geocode(subm.latitude, subm.longitude, city=True))
 
         if radio == 'manual':
@@ -302,20 +331,19 @@ def rescue_submit(request):
 
         # Ensure city is set
         if not subm.city:
-            subm.city = 'Unknown'  # or raise an error
+            subm.city = 'Unknown'
         print(subm.address)
         subm.condition = request.POST['condition']
         subm.description = request.POST['description']
+
         subm.save()
-        image_path = subm.image.path
+
         try:
             push_noti(self=subm)
         except Exception as e:
             print(e)
 
-
         return redirect('/dashboard/')
-
 
 @login_required(login_url='/user/login/')
 def my_reports(request):

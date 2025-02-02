@@ -19,8 +19,12 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+IMGUR_CLIENT_ID = '5f16d8c411f1210'
+IMGUR_CLIENT_SECRET = '42cddf900e52c675cefa355601a7a17ff20da5fb'
+
 # env = environ.Env(
-#     DEBUG=(bool, False),
+#     DEBUG=(bool, False),python manage.py upload_static_images --folder=static/images
 # )
 
 
