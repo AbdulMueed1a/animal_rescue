@@ -2,3 +2,4 @@ cloudinary==1.42.1
 Django==5.1.4
 firebase-admin==6.6.0
 requests==2.32.3
+dj-database-url==2.3.0
