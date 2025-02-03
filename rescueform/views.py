@@ -11,7 +11,7 @@ import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import submission
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import FCMToken
 
@@ -30,34 +30,32 @@ def index(request):
 def aboutus(request):
     return render(request, 'aboutus.html')
 
+@require_POST
+@login_required
 def toggle_mail_notifications(request):
-    user_profile = request.user.profile
-    # Toggle the mail notification setting
-    user_profile.mailnoti = not user_profile.mailnoti
-    user_profile.save()
+    try:
+        enabled = json.loads(request.body).get('enabled', False)
+        request.user.profile.mailnoti = enabled
+        request.user.profile.save()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
-    # Return the new state as JSON
-    return JsonResponse({
-        'status': 'success',
-        'mailnoti': user_profile.mailnoti
-    })
+@csrf_exempt
+def service_worker(request):
+    return HttpResponse(
+        open('static/firebase-messaging-sw.js').read(),
+        content_type='application/javascript'
+    )
 
 @require_POST
 @login_required
-def toggle_notifications(request):
+def toggle_push_notifications(request):
     try:
-        profile = request.user.profile
-        profile.pushnoti = not profile.pushnoti
-        profile.save()
-
-        if not profile.pushnoti:
-            # Optional: Delete FCM token when disabling
-            request.user.fcmtoken.delete()
-
-        return JsonResponse({
-            'status': 'success',
-            'pushnoti': profile.pushnoti
-        })
+        enabled = json.loads(request.body).get('enabled', False)
+        request.user.profile.pushnoti = enabled
+        request.user.profile.save()
+        return JsonResponse({'status': 'success'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 # from credentials import logindetails
+
 import os
 from pathlib import Path
 import dj_database_url

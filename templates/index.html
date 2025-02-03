@@ -9,7 +9,10 @@
     <title>PawsomeRescue</title>
     <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-messaging-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <style>
+
         * {
             margin: 0;
             padding: 0;
@@ -23,6 +26,77 @@
             --dark: #2F4858;
             --light: #F9F9F9;
         }
+
+        /* Updated CSS */
+        .icon-button {
+            position: inherit ;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-grid;
+            align-items: center;
+            gap: 8px;
+            margin: 8px;
+            width: 60px;
+            text-align: center;
+        }
+
+        .icon-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .icon-button.disabled {
+            align-items: center;
+            background: #9E9E9E !important;
+            cursor: not-allowed;
+        }
+
+        .icon-button .tooltip {
+            visibility: hidden;
+            width: 140px;
+            background: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .icon-button:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .fa-bell, .fa-envelope {
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        .error-shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(5px); }
+            50% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+
 
         body {
             background-color: var(--light);
@@ -378,6 +452,8 @@
                 padding: 1.5rem;
             }
         }
+
+
     </style>
 </head>
 
@@ -387,38 +463,30 @@
         <div class="logo">PawsomeRescue</div>
         <div class="menu-toggle">☰</div>
         <div class="nav-links">
-            <a href="#home">Home</a>
-            {% if user.is_superuser %}
-                <a href="/admin/">Admin Page</a>
-            {% else %}
-                <a href="#mission">Mission</a>
-            {% endif %}
+    <a href="#home">Home</a>
 
-            {% with user.groups.all as groups %}
-                {% if user.is_superuser %}
-                    <a href="/reports/">Monitor Reports</a>
-                {% else %}
-                    {% for group in groups %}
-                        {% if group.name == "supervisor" %}
-                            <a href="/reports/">Monitor Reports</a>
-                            {% with found=1 %}{% endwith %}
-                        {% endif %}
-                    {% endfor %}
-                    {% if not found %}
-                        <a href="#work">How It Works</a>
-                    {% endif %}
-                {% endif %}
-            {% endwith %}
+    {% if user.is_superuser %}
+        <a href="/admin/">Admin Page</a>
+        <a href="/reports/">Monitor Reports</a>
+    {% else %}
+        <a href="#mission">Mission</a>
 
-            <a href="#aboutus">About Us</a>
-            {% if user.is_authenticated %}
-                <a type="button"  href="/dashboard/" id="dasboard">Dashboard</a>
-                <a type="button"  href="user/logout" id="logout">LogOut</a>
-            {% else %}
-                <a type="button"  href="user/signup" id="signup">SignUp</a>
-                <a type="button"  href="user/login" id="signup">LogIn</a>
-            {% endif %}
-        </div>
+        {% if "supervisor" in user.groups.values_list.0 %}
+            <a href="/reports/">Monitor Reports</a>
+        {% endif %}
+    {% endif %}
+
+    <a href="#aboutus">About Us</a>
+
+    {% if user.is_authenticated %}
+        <a type="button" href="/dashboard/" id="dashboard">Dashboard</a>
+        <a type="button" href="/user/logout" id="logout">LogOut</a>
+    {% else %}
+        <a type="button" href="/user/signup" id="signup">SignUp</a>
+        <a type="button" href="/user/login" id="login">LogIn</a>
+    {% endif %}
+</div>
+
     </nav>
 
     <section class="hero" id="home">
@@ -507,27 +575,17 @@
 
             <!-- In your footer section where the notification button is -->
             {% if user.is_authenticated %}
-                <!-- Push Notifications Toggle -->
-                <button onclick="togglePushNotifications()"
-                        id="push-notification-btn"
-                        class="{{ user.profile.pushnoti|yesno:'enabled,disabled' }}">
-                    {% if user.profile.pushnoti %}
-                        🔔 Disable Push-Notifications
-                    {% else %}
-                        🔕 Enable Push-Notifications
-                    {% endif %}
-                </button>
+                <div class="notification-controls">
+                    <button id="notification-button" class="icon-button" onclick="togglePushNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="tooltip">Push Notifications</span>
+                    </button>
 
-                <!-- Mail Notifications Toggle -->
-                <button onclick="toggleMailNotifications()"
-                        id="mail-notification-btn"
-                        class="{{ user.profile.mailnoti|yesno:'enabled,disabled' }}">
-                    {% if user.profile.mailnoti %}
-                        📧 Disable Mail-Notifications
-                    {% else %}
-                        📬 Enable Mail-Notifications
-                    {% endif %}
-                </button>
+                    <button id="mail-button" class="icon-button" onclick="toggleMailNotifications()">
+                        <i class="fas fa-envelope"></i>
+                        <span class="tooltip">Email Notifications</span>
+                    </button>
+                </div>
             {% endif %}
 
 
@@ -545,7 +603,7 @@
         </div>
     </footer>
      <script>
-    // Firebase configuration and initialization for push notifications
+    // Firebase configuration and initialization
     const firebaseConfig = {
         apiKey: "AIzaSyA80SmOpP14bbtiVj2OA363_Cp8Hm0_W50",
         authDomain: "animal-rescue-portal.firebaseapp.com",
@@ -556,142 +614,140 @@
         measurementId: "G-4DDP7997KY"
     };
 
-    // Initialize Firebase for push notifications
+    // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const messaging = firebase.messaging();
 
+    // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/static/firebase-messaging-sw.js')
+        const swUrl = `${window.location.origin}/firebase-messaging-sw.js`;
+        navigator.serviceWorker.register(swUrl)
             .then(registration => {
-                console.log('Service Worker registered:', registration);
+                initFCM(registration);
             })
             .catch(error => {
-                console.error('Service Worker registration failed:', error);
+                navigator.serviceWorker.register('/static/firebase-messaging-sw.js')
+                    .then(fallbackReg => console.log('Fallback SW registered'))
+                    .catch(fallbackErr => console.error('Fallback SW failed:', fallbackErr));
             });
     }
 
-    // ------------- Push Notifications Functions ------------- //
-
-    // Toggle push notifications
-    async function togglePushNotifications() {
-        const btn = document.getElementById('push-notification-btn');
-        try {
-            const response = await fetch('/toggle-push-notifications/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            });
-
-            const data = await response.json();
-            if (data.status === 'success') {
-                // Update button text and class based on new push notification state
-                btn.textContent = data.pushnoti ? '🔔 Disable Push-Notifications' : '🔕 Enable Push-Notifications';
-                btn.classList.toggle('enabled', data.pushnoti);
-                btn.classList.toggle('disabled', !data.pushnoti);
-            }
-        } catch (error) {
-            console.error('Toggle push notifications failed:', error);
-        }
-    }
-
-    // Request permission and get FCM token for push notifications
-    async function enablePushNotifications() {
+    async function initFCM(registration) {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
             const token = await messaging.getToken({
-                vapidKey: 'BNmjhTKr3tR05Ct4P3EGqdxown9waj1HOPOTm2DrpTuSHc7Vi2m9bRamZ7hXZfE92gtQFmto8BIqcfj1hEWRmFo'
+                vapidKey: 'BNmjhTKr3tR05Ct4P3EGqdxown9waj1HOPOTm2DrpTuSHc7Vi2m9bRamZ7hXZfE92gtQFmto8BIqcfj1hEWRmFo',
+                serviceWorkerRegistration: registration
             });
-            if (token) {
-                await saveTokenToBackend(token);
-                localStorage.setItem('fcmToken', token);
-                updatePushButtonState(true);
-            }
+            localStorage.setItem('fcmToken', token);
+
         }
     }
 
-    async function disablePushNotifications() {
-        const token = await messaging.getToken();
-        if (token) {
-            await messaging.deleteToken(token);
-            await deleteTokenFromBackend(token);
+    // Unified Toggle Handler
+    async function handleToggle(endpoint, buttonId, enabledIcon, disabledIcon) {
+        const button = document.getElementById(buttonId);
+        if (!button) {
+            console.error(`Button ${buttonId} not found`);
+            return;
         }
-        localStorage.removeItem('fcmToken');
-        updatePushButtonState(false);
+
+        try {
+            button.classList.add('disabled');
+            const isEnabled = !button.classList.contains('enabled');
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Update UI immediately
+            button.innerHTML = `
+                <i class="fas fa-sync fa-spin"></i>
+                <span class="tooltip">Updating...</span>
+            `;
+
+            const response = await fetch(`/${endpoint}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ enabled: isEnabled })
+            });
+
+            if (!response.ok) throw new Error('Server update failed');
+
+            button.classList.toggle('enabled', isEnabled);
+            updateButtonAppearance(button, isEnabled, enabledIcon, disabledIcon);
+
+        } catch (error) {
+            console.error(`Toggle failed: ${error}`);
+            button.classList.add('error-shake');
+            setTimeout(() => button.classList.remove('error-shake'), 500);
+        } finally {
+            button.classList.remove('disabled');
+        }
     }
 
-    // Save FCM token to backend
+    // Specific toggle functions
+    function togglePushNotifications() {
+        handleToggle('toggle-push-notifications', 'notification-button', 'fa-bell', 'fa-bell-slash');
+    }
+
+    function toggleMailNotifications() {
+        handleToggle('toggle-mail-notifications', 'mail-button', 'fa-envelope', 'fa-envelope-open');
+    }
+
+    // Update button appearance
+    function updateButtonAppearance(button, enabled, enabledIcon, disabledIcon) {
+        button.innerHTML = `
+            <i class="fas ${enabled ? enabledIcon : disabledIcon}"></i>
+            <span class="tooltip">${enabled ? 'Enabled' : 'Disabled'} - Click to toggle</span>
+        `;
+        button.style.backgroundColor = enabled ? '#4CAF50' : '#ff4444';
+        localStorage.setItem(`${button.id}-enabled`, enabled);
+    }
+
+    // Initialize both buttons
+    const pushNotiEnabled = {{ user.profile.pushnoti|yesno:"true,false" }};
+    const mailNotiEnabled = {{ user.profile.mailnoti|yesno:"true,false" }};
+    document.addEventListener('DOMContentLoaded', () => {
+    const buttons = [
+        { id: 'notification-button', enabled: pushNotiEnabled, enabledIcon: 'fa-bell', disabledIcon: 'fa-bell-slash' },
+        { id: 'mail-button', enabled: mailNotiEnabled, enabledIcon: 'fa-envelope', disabledIcon: 'fa-envelope-open' }
+    ];
+
+    buttons.forEach(({ id, enabled, enabledIcon, disabledIcon }) => {
+        const button = document.getElementById(id);
+        if (button) {
+            button.classList.toggle('enabled', enabled);
+            updateButtonAppearance(button, enabled, enabledIcon, disabledIcon);
+            // Optionally, update localStorage if you need to persist this state locally
+            localStorage.setItem(`${id}-enabled`, enabled);
+        }
+    });
+});
+
+
+    // Token management functions
     async function saveTokenToBackend(token) {
         await fetch('/save-fcm-token/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
             },
             body: JSON.stringify({ token })
         });
     }
 
-    // Delete FCM token from backend
     async function deleteTokenFromBackend(token) {
         await fetch('/delete-fcm-token/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
             },
             body: JSON.stringify({ token })
         });
     }
-
-    // Update push notifications button UI
-    function updatePushButtonState(isEnabled) {
-        const btn = document.getElementById('push-notification-btn');
-        btn.textContent = isEnabled ? '🔔 Disable Push-Notifications' : '🔕 Enable Push-Notifications';
-        btn.style.backgroundColor = isEnabled ? '#ff4444' : '#ffb727';
-    }
-
-    // Initialize push notification state
-    function initializePushNotificationState() {
-        const storedToken = localStorage.getItem('fcmToken');
-        updatePushButtonState(!!storedToken);
-    }
-
-    // ------------- Mail Notifications Functions ------------- //
-
-    // Toggle mail notifications
-    async function toggleMailNotifications() {
-    const btn = document.getElementById('mail-notification-btn');
-    try {
-        const response = await fetch('/toggle-mail-notifications/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        });
-        const data = await response.json(); // Now this should correctly parse
-        if (data.status === 'success') {
-            btn.textContent = data.mailnoti ? '📧 Disable Mail-Notifications' : '📬 Enable Mail-Notifications';
-            btn.classList.toggle('enabled', data.mailnoti);
-            btn.classList.toggle('disabled', !data.mailnoti);
-        }
-    } catch (error) {
-        console.error('Toggle mail notifications failed:', error);
-    }
-}
-
-
-    // (Optional) You might want to initialize mail notifications UI state.
-    // This could be done via an AJAX call to get the current status or simply
-    // rely on the rendered template.
-
-    // ------------- Initial Setup ------------- //
-    document.addEventListener('DOMContentLoaded', () => {
-        initializePushNotificationState();
-        // Optionally, you can add an initialization for mail notifications if needed.
-    });
 </script>
 
 </script>
