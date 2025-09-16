@@ -7,7 +7,7 @@ charset-normalizer==3.4.1
 cloudinary==1.42.1
 cryptography==44.0.0
 dj-database-url==2.3.0
-Django==5.1.4
+Django==5.1.5
 firebase-admin==6.6.0
 google-api-core==2.24.1
 google-api-python-client==2.160.0
